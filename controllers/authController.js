@@ -14,7 +14,7 @@ const login = (request, response) => {
             contraseña: request.body.contraseña,
             activo: true
         },
-        attributes: ['id', 'profile_id', 'nombre', 'apellidos', 'nick']
+        attributes: ['id', 'perfil_id', 'nombre', 'apellidos', 'nick']
     }).then(usuario => {
         if (usuario) {
             const token = jwt.sign({ usuario }, 'mi_llave_secreta', { expiresIn: '24h' });

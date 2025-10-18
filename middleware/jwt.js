@@ -13,7 +13,7 @@ const authenticateAdmin = (req, res, next) => {
         if (err) {
             return res.status(403).send({ message: 'Sin autorización' });
         }
-        if (decoded.usuario.profile_id === 1) {
+        if (decoded.usuario.perfil_id === 1) {
             next();
         }
         else {
