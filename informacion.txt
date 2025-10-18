@@ -1,0 +1,2601 @@
+5.1 Gestión de base de datos para nuestro proyecto: MySQL
+MySQL es un sistema de gestión de bases de datos relacional muy popular y ampliamente utilizado. Permite organizar y administrar datos en tablas y utiliza SQL como lenguaje para consultar y manipular los datos. Es escalable, de alto rendimiento y cuenta con una amplia comunidad de usuarios y soporte.
+5.1.1 Instalación a través de XAMPP
+Para instalar XAMPP, puedes seguir estos pasos:
+Descarga el archivo de instalación de XAMPP desde el sitio web oficial de Apache Friends (https://www.apachefriends.org/index.html).
+Una vez descargado, ejecuta el archivo de instalación. Es posible que se te solicite confirmar permisos de administrador en tu sistema.
+Se abrirá un asistente de instalación. Haz clic en "Next" o "Siguiente" para avanzar en cada paso.
+En la siguiente pantalla, selecciona los componentes que deseas instalar. Para este caso  dejar las opciones predeterminadas seleccionadas, que incluyen Apache, MySQL, PHP y phpMyAdmin. Sin embargo, puedes personalizar la selección según tus necesidades.
+Elige la carpeta de destino donde deseas instalar XAMPP. La ubicación predeterminada suele ser adecuada, pero también puedes elegir otra ubicación si lo prefieres.
+Durante la instalación, es posible que se te solicite instalar controladores adicionales o permitir el acceso de red. Asegúrate de permitir estas solicitudes para que XAMPP funcione correctamente.
+Una vez completada la instalación, se te mostrará una pantalla de confirmación. Asegúrate de marcar la opción para iniciar el Panel de Control de XAMPP y luego haz clic en "Finish" o "Finalizar".
+Se abrirá el Panel de Control de XAMPP, donde puedes iniciar los servicios de Apache, MySQL y otros componentes.
+Para probar que XAMPP se ha instalado correctamente, abre tu navegador web y visita "http://localhost". Si ves la página de inicio de XAMPP, significa que la instalación ha sido exitosa.
+¡Eso es todo! Ahora tienes XAMPP instalado en tu sistema, lo que te permite configurar un entorno de desarrollo local con Apache, MySQL y PHP. Puedes comenzar a desarrollar y probar aplicaciones web en tu máquina local utilizando XAMPP.
+5.1.2 Base de datos para nuestro proyecto
+Ahora que ya definimos anteriormente las estructuras de nuestro proyecto, es momento de pasar al diseño de nuestra base de datos la cual almacenará toda la información de nuestra API. Para poder tener acceso a nuestro gestor de base de datos abrimos nuestro panel de control de XAMPP, iniciamos el servicio de Apache y MySQL, posteriormente presionamos en “Admin” que esta dentro de las opciones de MySQL.
+Ahora definamos nuestro script de base de datos.
+Abrimos el phpMyAdmin y nos vamos donde dice SQL, una vez estando ahí creamos nuestra base de datos:
+create database db_news
+​
+Luego seleccionamos nuestra base de daos que acabamos de crear y volvemos a dar en SQL, estando ahí creamos nuestras tablas:
+USE db_news;
+
+CREATE TABLE profiles (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE states (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL UNIQUE,
+    `abreviacion` VARCHAR(5) NOT NULL UNIQUE,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(30) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(30) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(30) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE users(
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `perfil_id` BIGINT(20) UNSIGNED NOT NULL,
+    `nombre` VARCHAR(100) NOT NULL,
+    `apellidos` VARCHAR(100) NOT NULL,
+    `nick` VARCHAR(20) NOT NULL,
+    `correo` VARCHAR(255) NOT NULL UNIQUE,
+    `contraseña` VARCHAR(255) NOT NULL,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(20) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(20) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(20) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+ALTER TABLE users ADD FOREIGN KEY (perfil_id) REFERENCES profiles(id);
+
+
+CREATE TABLE categories(
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL UNIQUE,
+    `descripcion` VARCHAR(255) NOT NULL,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(20) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(20) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(20) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+
+CREATE TABLE news(
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `categoria_id` BIGINT(20) UNSIGNED NOT NULL,
+    `estado_id` BIGINT(20) UNSIGNED NOT NULL,
+    `usuario_id` BIGINT(20) UNSIGNED NOT NULL,
+    `titulo` VARCHAR(50) NOT NULL,
+    `fecha_publicacion` DATETIME NOT NULL,
+    `descripcion` VARCHAR(1000) NOT NULL,
+    `imagen` MEDIUMTEXT NOT NULL,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(20) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(20) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(20) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+ALTER TABLE news ADD FOREIGN KEY (categoria_id) REFERENCES categories(id);
+ALTER TABLE news ADD FOREIGN KEY (estado_id) REFERENCES states(id);
+ALTER TABLE news ADD FOREIGN KEY (usuario_id) REFERENCES users(id);
+5.2 ORM 
+Un ORM (Object-Relational Mapping) es una técnica de programación que permite mapear objetos  a tablas en una base de datos relacional. Básicamente, actúa como una capa de abstracción entre la lógica de la aplicación y la base de datos, facilitando la interacción y manipulación de datos.
+Un ORM proporciona una serie de clases y métodos que permiten realizar operaciones CRUD (Create, Read, Update, Delete) en la base de datos utilizando objetos y métodos del lenguaje de programación en lugar de escribir consultas SQL directamente. Esto simplifica y agiliza el desarrollo de aplicaciones, ya que los desarrolladores pueden trabajar con objetos y métodos familiares en lugar de tener que lidiar con SQL y manipulación manual de datos.
+Algunas ventajas de utilizar un ORM son:
+Abstracción de la base de datos: Un ORM oculta los detalles específicos de la base de datos y proporciona una interfaz de programación consistente para trabajar con diferentes sistemas de gestión de bases de datos. Esto permite que una aplicación sea más portátil y no dependa de una base de datos específica.
+Productividad: Utilizar un ORM simplifica y acelera el desarrollo de aplicaciones, ya que se pueden realizar operaciones de base de datos comunes utilizando métodos y objetos orientados a objetos, sin tener que escribir consultas SQL manualmente.
+Mantenimiento y flexibilidad: Los ORM proporcionan funcionalidades adicionales, como la validación de datos, la gestión de relaciones y la optimización de consultas. Además, facilitan el mantenimiento de la aplicación, ya que los cambios en la estructura de la base de datos se pueden reflejar automáticamente en los objetos del ORM.
+Seguridad: Un ORM ayuda a prevenir ataques de inyección de SQL, ya que las consultas se generan de manera segura utilizando métodos y parámetros predefinidos en lugar de concatenar cadenas SQL.
+5.2.1 ORM para nuestro proyecto: Sequelize
+Sequelize es un ORM de Node.js compatible con varios sistemas de gestión de bases de datos relacionales, como MySQL, PostgreSQL, SQLite y MSSQL.
+Sequelize proporciona una capa de abstracción sobre la base de datos, permitiendo a los desarrolladores interactuar con la base de datos utilizando modelos y consultas basadas en objetos en lugar de escribir consultas SQL directamente. Algunas características y beneficios de Sequelize son:
+Soporte para varios sistemas de bases de datos: Sequelize es compatible con una variedad de sistemas de bases de datos relacionales, lo que brinda flexibilidad para elegir el sistema que mejor se adapte a tus necesidades.
+Modelos y relaciones: Puedes definir modelos que representen las tablas de la base de datos y establecer relaciones entre ellos. Sequelize facilita la definición de asociaciones como uno a uno, uno a muchos y muchos a muchos, lo que simplifica la gestión de relaciones complejas entre entidades.
+Migraciones de base de datos: Sequelize proporciona herramientas para realizar migraciones de base de datos, lo que facilita la modificación y actualización de la estructura de la base de datos a medida que evoluciona tu aplicación.
+Consultas y transacciones: Puedes realizar consultas complejas utilizando métodos de Sequelize, que generan consultas SQL correspondientes. También puedes trabajar con transacciones para garantizar la integridad de los datos en operaciones que requieren cambios múltiples en la base de datos.
+Validaciones y control de datos: Sequelize incluye opciones para validar los datos antes de guardarlos en la base de datos, lo que ayuda a mantener la integridad y la coherencia de los datos. También proporciona métodos para controlar las operaciones de creación, actualización y eliminación de registros.
+Para comenzar a utilizar Sequelize con Express, debes instalar el paquete "sequelize" y el driver correspondiente para tu base de datos (por ejemplo, "mysql2" para MySQL). Luego, puedes definir tus modelos, establecer las relaciones y utilizar los métodos y consultas proporcionados por Sequelize en tus controladores de Express.
+5.3 Creación de nuestro proyecto con Sequelize
+Creamos una carpeta llamada ApiNews dentro de la carpeta de nuestro curso. 
+Ahora dentro de la carpeta, creamos un proyecto de Express JS con la configuración inicial que ya conocemos.
+const express = require('express')
+const app = express();
+const PORT = 3000
+
+app.use(express.json());
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+​
+Instalamos el driver correspondiente a nuestra base de datos, en este caso es MySQL, abrimos la terminal y ejecutamos:
+npm install mysql2
+​
+Instalamos Sequelize en nuestro proyecto, abrimos la terminal y ejecutamos:
+npm install sequelize
+​
+Una vez ya tenemos los paquetes instalados, vamos a crear un archivo dentro de la raíz de nuestro proyecto, el cual se debe llamar config.db.js este se encargará de la conexión con nuestra base de datos, pegamos el siguiente código
+const Sequelize = require('sequelize')
+
+
+const connection = new Sequelize('db_news', 'root', '', {
+    host: 'localhost',
+    dialect: 'mysql',
+})
+
+
+connection.authenticate()
+    .then(() => {
+        console.log('Se ha establecido conexión con la base de datos')
+    })
+    .catch(err => {
+        console.log('No se pudo establecer conexión con la base de datos')
+    })
+
+module.exports = { connection };
+​
+5.3.1 Opción con SQLServer
+Iniciar sesión por la autenticación de SQL Server Authentication en SQL Server
+
+Ejecutar paso por paso el siguiente script
+CREATE DATABASE db_news_api;
+USE db_news_api;
+
+CREATE TABLE profiles (
+    id BIGINT NOT NULL IDENTITY(1,1),
+    nombre VARCHAR(50) NOT NULL,
+    createdAt DATETIME2 NULL,
+    updatedAt DATETIME2 NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO profiles (nombre, createdAt, updatedAt)
+VALUES ('Administrador', GETDATE(), GETDATE());
+
+INSERT INTO profiles (nombre, createdAt, updatedAt)
+VALUES ('Contribuidor', GETDATE(), GETDATE());
+
+
+CREATE TABLE states (
+    id BIGINT NOT NULL IDENTITY(1,1),
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    abreviacion VARCHAR(5) NOT NULL UNIQUE,
+    activo BIT NOT NULL DEFAULT 1,
+    UserAlta VARCHAR(30) NOT NULL,
+    FechaAlta DATETIME2 NOT NULL,
+    UserMod VARCHAR(30) NOT NULL,
+    FechaMod DATETIME2 NOT NULL,
+    UserBaja VARCHAR(30) NOT NULL,
+    FechaBaja DATETIME2 NOT NULL,
+    createdAt DATETIME2 NULL,
+    updatedAt DATETIME2 NULL,
+    PRIMARY KEY (id)
+);
+
+
+INSERT INTO states (nombre, abreviacion, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Yucatán', 'YUC', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO states (nombre, abreviacion, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Baja California', 'BC', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO states (nombre, abreviacion, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Campeche', 'CAM', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO states (nombre, abreviacion, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Chiapas', 'CHI', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO states (nombre, abreviacion, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Chihuahua', 'CHIH', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+
+CREATE TABLE users (
+    id BIGINT NOT NULL IDENTITY(1,1),
+    perfil_id BIGINT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    nick VARCHAR(20) NOT NULL,
+    correo VARCHAR(255) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NOT NULL,
+    activo BIT NOT NULL DEFAULT 1,
+    UserAlta VARCHAR(20) NOT NULL,
+    FechaAlta DATETIME2 NOT NULL,
+    UserMod VARCHAR(20) NOT NULL,
+    FechaMod DATETIME2 NOT NULL,
+    UserBaja VARCHAR(20) NOT NULL,
+    FechaBaja DATETIME2 NOT NULL,
+    createdAt DATETIME2 NULL,
+    updatedAt DATETIME2 NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (perfil_id) REFERENCES profiles(id)
+);
+
+INSERT INTO users (perfil_id, nombre, apellidos, nick, correo, contraseña, activo, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (1, 'Administrador', 'General', 'Admin', 'admin@gmail.com', 'cursoexpressjs', 1, 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO users (perfil_id, nombre, apellidos, nick, correo, contraseña, activo, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (2, 'Jhon', 'Boston', 'jhonBoston1', 'jhon@gmail.com', '123456', 1, 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+CREATE TABLE categories (
+    id BIGINT NOT NULL IDENTITY(1,1),
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    descripcion VARCHAR(255) NOT NULL,
+    activo BIT NOT NULL DEFAULT 1,
+    UserAlta VARCHAR(20) NOT NULL,
+    FechaAlta DATETIME2 NOT NULL,
+    UserMod VARCHAR(20) NOT NULL,
+    FechaMod DATETIME2 NOT NULL,
+    UserBaja VARCHAR(20) NOT NULL,
+    FechaBaja DATETIME2 NOT NULL,
+    createdAt DATETIME2 NULL,
+    updatedAt DATETIME2 NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO categories(nombre, descripcion, activo, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Salud Médica', 'Noticias más importantes acerca de la salud', 1, 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO categories(nombre, descripcion, activo, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES ('Ecología y fauna', 'Todo lo importante acerca de los seres vivos en nuestro país', 1, 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+CREATE TABLE news (
+    id BIGINT NOT NULL IDENTITY(1,1),
+    categoria_id BIGINT NOT NULL,
+    estado_id BIGINT NOT NULL,
+    usuario_id BIGINT NOT NULL,
+    titulo VARCHAR(50) NOT NULL,
+    fecha_publicacion DATETIME2 NOT NULL,
+    descripcion VARCHAR(1000) NOT NULL,
+    imagen VARCHAR(MAX) NOT NULL,
+    activo BIT NOT NULL DEFAULT 1,
+    UserAlta VARCHAR(20) NOT NULL,
+    FechaAlta DATETIME2 NOT NULL,
+    UserMod VARCHAR(20) NOT NULL,
+    FechaMod DATETIME2 NOT NULL,
+    UserBaja VARCHAR(20) NOT NULL,
+    FechaBaja DATETIME2 NOT NULL,
+    createdAt DATETIME2 NULL,
+    updatedAt DATETIME2 NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (categoria_id) REFERENCES categories(id),
+    FOREIGN KEY (estado_id) REFERENCES states(id),
+    FOREIGN KEY (usuario_id) REFERENCES users(id)
+);
+
+
+INSERT INTO news (categoria_id, estado_id, usuario_id, titulo, fecha_publicacion, descripcion, imagen, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (2, 1, 1, 'Descubren nueva especie de mariposa', '2023-08-14 12:00:00.0000000', 'Científicos han anunciado el descubrimiento de una nueva especie de mariposa en una expedición a la selva amazónica. La especie, llamada "Morpho amazonica", posee colores y patrones únicos en sus alas.', 'imagen.png', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO news (categoria_id, estado_id, usuario_id, titulo, fecha_publicacion, descripcion, imagen, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (1, 2, 2, 'Avance médico: Terapia génica muestra promesa', '2023-08-15 12:00:00.0000000', 'Investigadores informan avances significativos en el uso de terapia génica para tratar enfermedades raras. En ensayos clínicos, pacientes con afecciones genéticas hereditarias han experimentado mejoras notables después del tratamiento.', 'imagen.png', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO news (categoria_id, estado_id, usuario_id, titulo, fecha_publicacion, descripcion, imagen, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (2, 3, 1, 'Se registra aumento en la población de aves', '2023-08-16 12:00:00.0000000', 'Los esfuerzos de conservación están dando frutos mientras la población de pandas gigantes en su hábitat natural experimenta un aumento. Los expertos atribuyen este éxito a medidas de protección y programas de reproducción en cautiverio.', 'imagen.png', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO news (categoria_id, estado_id, usuario_id, titulo, fecha_publicacion, descripcion, imagen, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (1, 4, 2, 'Nueva investigación revale datos sobre el sueño', '2023-08-17 12:00:00.0000000', 'Un estudio reciente sugiere que la calidad del sueño puede tener un impacto significativo en la salud cardiovascular. Los resultados muestran que patrones de sueño irregulares podrían aumentar el riesgo de enfermedades del corazón.', 'imagen.png', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+
+INSERT INTO news (categoria_id, estado_id, usuario_id, titulo, fecha_publicacion, descripcion, imagen, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja, createdAt, updatedAt)
+VALUES (1, 5, 1, 'Avance en la lucha contra la contaminación', '2023-08-18 12:00:00.0000000', 'Científicos anuncian el desarrollo de un nuevo material biodegradable que podría ayudar a reducir la contaminación plástica en los océanos. Este avance prometedor ofrece esperanzas para abordar uno de los mayores desafíos ambientales de nuestro tiempo.', 'imagen.png', 'Admin', '1990-01-01 00:00:00.0000000', '', '', '', '', GETDATE(), GETDATE());
+​
+Abrir nuestro proyecto ApiNews e Instalar la paqueteria tedious
+npm install tedious
+​
+En el archivo config.js reemplazar las propiedades DB_USER y DB_PASSWORD según con las credenciales que nos autenticamos en SQL Server, ejemplo:
+const PORT = process.env.PORT || 3000
+
+const DB_HOST = process.env.DB_HOST || '10.10.0.7'
+
+const DB_USER = process.env.DB_USER || 'sa'
+
+const DB_PASSWORD = process.env.DB_PASSWORD || 'Sql2008'
+
+const DB_NAME = process.env.DB_NAME || 'db_news_api'
+
+const DB_PORT = process.env.DB_PORT || 1433
+
+module.exports = { PORT, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT };
+​
+En el archivo config.db.js modificar la propiedad dialect por mssql, quedando la parte de connection de la siguiente manera:
+const Sequelize = require('sequelize')
+require('dotenv').config();
+const { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER, DB_PORT } = require('./config.js')
+
+const connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
+    dialect: 'mssql',
+    dialectOptions: {
+        options: {
+            //instanceName: 'Sqlserver',
+            encrypt: false,
+        }
+    },
+    port: DB_PORT
+})
+
+connection.authenticate()
+    .then(() => {
+        console.log('Se ha establecido conexión con la base de datos con éxito')
+    })
+    .catch(err => {
+        console.log(err)
+    })
+
+
+module.exports = { connection };
+​
+5.4 Modelos en Sequelize
+NewModel.js
+const { DataTypes } = require('sequelize');
+const { connection } = require("../config.db");
+const { Category } = require('./CategoryModel');
+const { State } = require('./StateModel');
+const { User } = require('./UserModel');
+
+const New = connection.define('new', {
+    categoria_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    estado_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    usuario_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    titulo: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    fecha_publicacion: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    descripcion: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    imagen: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    activo: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    },
+    UserAlta: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "Admin"
+    },
+    FechaAlta: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: "1990-01-01T00:00:00.000Z"
+    },
+    UserMod: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: ""
+    },
+    FechaMod: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue:'1990-01-01T00:00:00.000Z'
+    },
+    UserBaja: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: ""
+    },
+    FechaBaja: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue:'1990-01-01T00:00:00.000Z'
+    },
+})
+
+New.belongsTo(Category, { as: 'categoria', foreignKey: 'categoria_id' })
+New.belongsTo(State, { as: 'estado', foreignKey: 'estado_id' })
+New.belongsTo(User, { as: 'usuario', foreignKey: 'usuario_id' })
+
+
+module.exports = { New };
+​
+StateModel.js
+const { DataTypes } = require('sequelize');
+const { connection } = require("../config.db");
+
+
+const State = connection.define('state', {
+  nombre: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  abreviacion: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  activo: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
+  },
+  UserAlta: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "Admin",
+  },
+  FechaAlta: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: "1990-01-01T00:00:00.000Z"
+  },
+  UserMod: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: ""
+  },
+  FechaMod: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue:'1990-01-01T00:00:00.000Z'
+  },
+  UserBaja: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: ""
+  },
+  FechaBaja: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue:'1990-01-01T00:00:00.000Z'
+  },
+})
+
+
+module.exports = { State };
+​
+UserModel.js
+const { DataTypes } = require('sequelize');
+const { connection } = require("../config.db");
+const { Profile } = require('./ProfileModel');
+
+
+const User = connection.define('user', {
+    perfil_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    nombre: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    apellidos: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    nick: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    correo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    contraseña: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    activo: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    },
+    UserAlta: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "Admin"
+    },
+    FechaAlta: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: "1990-01-01T00:00:00.000Z"
+    },
+    UserMod: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: ""
+    },
+    FechaMod: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue:'1990-01-01T00:00:00.000Z'
+    },
+    UserBaja: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: ""
+    },
+    FechaBaja: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue:'1990-01-01T00:00:00.000Z'
+    },
+})
+
+User.belongsTo(Profile, { as: 'perfil', foreignKey: 'perfil_id' })
+
+module.exports = { User };
+6. Controladores en Express JS
+En Express.js, los controladores son funciones o módulos que se utilizan para manejar y responder a las solicitudes HTTP entrantes. Express.js es un marco de aplicaciones web de Node.js que facilita la creación de servidores y la implementación de rutas para manejar diferentes tipos de solicitudes.
+Los controladores en Express.js ayudan a separar la lógica empresarial y las acciones específicas de una ruta en funciones reutilizables y modularizadas. En lugar de definir todas las operaciones y la lógica en el archivo de definición de ruta, los controladores permiten mantener el código más limpio, modular y fácil de mantener.
+Un controlador en Express.js generalmente sigue el patrón de función middleware. Recibe dos objetos, req (solicitud) y res (respuesta), que representan la solicitud HTTP entrante y la respuesta HTTP que se enviará al cliente, respectivamente.
+Ejemplo de un controlador en Express JS:
+// Controlador para la ruta GET '/users'
+function getUsers(req, res) {
+  // Lógica para obtener los usuarios de la base de datos
+  const users = [
+    { id: 1, name: 'John' },
+    { id: 2, name: 'Jane' },
+    { id: 3, name: 'Bob' }
+  ];
+
+  // Enviar respuesta al cliente
+  res.json(users);
+}
+
+// Ruta que utiliza el controlador
+app.get('/users', getUsers);
+​
+6.1 Métodos de Sequelize para trabajar con controladores
+Al trabajar con los modelos de Sequelize, nos ofrece una amplia variedad de métodos para trabajar nuestras consultas. A continuación se presentan algunos de los métodos que Sequelize ofrece para realizar dichas consultas.
+findAll: Este método se utiliza para recuperar todos los registros que coinciden con ciertos criterios. Puede usarse para obtener todos los registros en una tabla o para filtrar los resultados utilizando cláusulas where, attributes (para seleccionar columnas específicas) y otras opciones.
+//Obtener todos
+User.findAll();
+
+//Obtener todos con solo ciertos atributos
+User.findAll({
+			attributes: ['id', 'name', 'email']
+});
+
+//Obtener filtrado con ciertos atributos
+User.findAll({
+			where: {
+				name: 'Jhon'
+			},
+			attributes: ['id', 'name', 'email']
+});
+​
+findOne: Este método se utiliza para recuperar un solo registro que cumple con ciertas condiciones.
+User.findOne({ where: { email: 'example@example.com' }, attributes: ['nick'] });
+​
+findByPk: Este método se utiliza para recuperar un registro por su clave primaria (primary key).
+User.findByPk(1);
+​
+create: Este método se utiliza para crear un nuevo registro en la base de datos.
+User.create({ name: 'John', age: 25, email: 'john@example.com' });
+​
+update: Este método se utiliza para actualizar uno o varios registros en la base de datos que cumplan con ciertas condiciones.
+User.update(
+			{ 
+				name: "Martin",
+				age: 26 
+			}, 
+			{ where: { 
+					id: 1 
+				} 
+			}
+);
+​
+destroy: Este método se utiliza para eliminar uno o varios registros de la base de datos que cumplan con ciertas condiciones.
+User.destroy({ 
+		where: { age: 18 } 
+	}
+);
+​
+count: Este método se utiliza para contar el número de registros que coinciden con ciertas condiciones.
+User.count({ 
+				where: { age: { [Op.gt]: 18 } 
+		} 
+});
+​
+Estos son solo algunos ejemplos de los métodos que Sequelize ofrece para realizar consultas SQL utilizando sus modelos. Sequelize también proporciona muchas otras opciones y métodos avanzados para realizar operaciones más complejas en bases de datos relacionales. Consulta la documentación oficial de Sequelize para obtener más información sobre todas las opciones disponibles.
+Ejemplo de un controlador en ExpressJS con las consultas básicas
+const { User } = require('../models/UserModel')
+
+//Obtener todos o filtrado
+const get = (request, response) => {
+  const filters = request.query
+  User.findAll({
+    where: filters
+  })
+    .then(entities => {
+      response.json(entities);
+    })
+    .catch(err => {
+        console.log(err)
+      response.status(500).send('Error consultando los datos');
+    })
+}
+
+//Obtener uno por su id
+const getById = (request, response) => {
+  const id = request.params.id;
+  User.findByPk(id)
+    .then(entitie => {
+      if (entitie) {
+        response.json(entitie);
+      }
+      else {
+        response.status(404).send('Recurso no encontrado')
+      }
+    })
+    .catch(err => {
+      response.status(500).send('Error al consultar el dato');
+    })
+}
+
+//Crear nuevo
+const create = (request, response) => {
+  User.create(request.body).then(
+    newEntitie => {
+      response.status(201).json(newEntitie)
+    }
+  )
+    .catch(err => {
+      response.status(500).send('Error al crear');
+    })
+}
+
+//Actualizar
+const update = (request, response) => {
+  const id = request.params.id;
+  User.update(
+    request.body
+    , {
+      where: {
+        id: id
+      }
+    })
+    .then(numRowsUpdated => {
+      response.status(200).send(`${numRowsUpdated} registro actualizado`);
+    })
+    .catch(err => {
+      response.status(500).send('Error al actualizar');
+    });
+}
+
+//Eliminar
+const destroy = (request, response) => {
+  const id = request.params.id;
+  User.destroy(
+    {
+      where: {
+        id: id
+      }
+    }
+  ).then(numRowsDeleted => {
+    response.status(200).send(`${numRowsDeleted} registro eliminado`);
+  })
+    .catch(err => {
+      response.status(500).send('Error al eliminar');
+    });
+}
+
+module.exports = {
+  get,
+  getById,
+  create,
+  update,
+  destroy
+};
+​
+6.2 Creación de los controladores para nuestra API
+Una vez que ya conocemos todas las posibilidades que nos brinda Sequelize para la creación de nuestros controladores, es hora de crear los propios para nuestra API según los endpoints que establecimos con anterioridad.
+Vamos a ver como crear y enrutar nuestro controlador para nuestro modelo Profile
+Paso 1: En la raíz de nuestro proyecto vamos a crear una carpeta que se llame controllers
+Paso 2: Dentro de la carpeta creada vamos a crear un archivo llamado ProfileController.js
+Paso 3: Pegar el siguiente código:
+const { Profile } = require('../models/ProfileModel')
+
+
+const get = (request, response) => {
+  const { nombre} = request.query
+  const filters = {}
+
+  if(nombre){
+    filters.nombre = nombre
+  }
+
+  Profile.findAll({
+    where: filters
+  })
+    .then(entities => {
+      response.json(entities);
+    })
+    .catch(err => {
+        console.log(err)
+      response.status(500).send('Error consultando los datos');
+    })
+
+}
+
+const getById = (request, response) => {
+  const id = request.params.id;
+  Profile.findByPk(id)
+    .then(entitie => {
+      if (entitie) {
+        response.json(entitie);
+      }
+      else {
+        response.status(404).send('Recurso no encontrado')
+      }
+    })
+    .catch(err => {
+      response.status(500).send('Error al consultar el dato');
+    })
+}
+
+const create = (request, response) => {
+
+  Profile.create(request.body).then(
+    newEntitie => {
+      response.status(201).json(newEntitie)
+    }
+  )
+    .catch(err => {
+      response.status(500).send('Error al crear');
+    })
+}
+
+const update = (request, response) => {
+  const id = request.params.id;
+  Profile.update(
+    request.body
+    , 
+    {
+      where: {
+        id: id
+      }
+    })
+    .then(numRowsUpdated => {
+      response.status(200).send(`${numRowsUpdated} registro actualizado`);
+    })
+    .catch(err => {
+      response.status(500).send('Error al actualizar');
+    });
+}
+
+const destroy = (request, response) => {
+  const id = request.params.id;
+  Profile.destroy(
+    {
+      where: {
+        id: id
+      }
+    }
+  ).then(numRowsDeleted => {
+    response.status(200).send(`${numRowsDeleted} registro eliminado`);
+  })
+    .catch(err => {
+      response.status(500).send('Error al eliminar');
+    });
+}
+
+module.exports = {
+  get,
+  getById,
+  create,
+  update,
+  destroy
+};
+​
+Paso 4: Una vez ya creado nuestro controlador, necesitamos enrutarlo, para eso vamos a crear una carpeta en la raíz de nuestro proyecto, esta se llamará routes
+Paso 5: Dentro de esta carpeta que acabamos de crear, crearemos un archivo llamado ProfileRoute.js y pegamos el siguiente código
+var express = require('express');
+
+const {get, getById, create, update, destroy}  = require('../controllers/ProfileController');
+const api = express.Router();
+
+api.get('/perfiles', get);
+api.get('/perfiles/:id', getById)
+api.post('/perfiles', create)
+api.put('/perfiles/:id', update)
+api.delete('/perfiles/:id', destroy)
+
+
+module.exports = api;
+​
+Paso 6: Ahora en nuestro archivo principal llamado app.js debemos exportar y usar las rutas que acabamos de crear, el archivo se debe de ver de la siguiente manera
+const express = require('express')
+const app = express();
+const PORT = 3000
+
+app.use(express.json());
+
+//Exportar Rutas
+const profile_routes = require('./routes/ProfileRoute');
+
+//Usar las rutas
+
+app.use('/api', profile_routes)
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+​
+Paso 7: Correr nuestra api en la terminal con el comando node app.js y consumir nuestras rutas en Thunder Client
+Tarea: Crear los demás controladores para nuestros modelos
+CategoryController.js
+const {Category} = require('../models/CategoryModel')
+
+const get = (request, response) => {
+    const {nombre,descripcion,activo,useralta} =request.query
+    const filters = {}
+    if (nombre) {
+        filters.nombre = nombre 
+    }
+    if (descripcion) {
+        filters.descripcion = descripcion
+    }
+    if (activo){
+        filters.activo = activo
+    }
+    if (useralta){
+        filters.useralta =useralta
+    }
+
+    //const filters = request.query
+    Category.findAll({
+      where: filters
+    })
+      .then(entities => {
+        response.json(entities);
+      })
+      .catch(err => {
+          console.log(err)
+        response.status(500).send('Error consultando los datos');
+      })
+  
+  }
+  
+const getById = (request, response) => {
+    const id = request.params.id;
+    Category.findByPk(id)
+
+      .then(entitie => {
+        if (entitie) {
+          response.json(entitie);
+        }
+        else {
+          response.status(404).send('Recurso no encontrado')
+        }
+      })
+      .catch(err => {
+        response.status(500).send('Error al consultar el dato');
+      })
+  }
+  
+  
+const create = (request, response) => {
+
+    Category.create(request.body).then(
+      newEntitie => {
+        response.status(201).json(newEntitie)
+      }
+    )
+      .catch(err => {
+        response.status(500).send('Error al crear');
+      })
+  }
+  
+  const update = (request, response) => {
+    const id = request.params.id;
+    Category.update(
+      request.body
+      , 
+      {
+        where: {
+          id: id
+        }
+      })
+      .then(numRowsUpdated => {
+        response.status(200).send(`${numRowsUpdated} registro actualizado`);
+      })
+      .catch(err => {
+        response.status(500).send('Error al actualizar');
+      });
+  }
+
+  
+const destroy = (request, response) => {
+    const id = request.params.id;
+    Category.destroy(
+      {
+        where: {
+          id: id
+        }
+      }
+    ).then(numRowsDeleted => {
+      response.status(200).send(`${numRowsDeleted} registro eliminado`);
+    })
+      .catch(err => {
+        response.status(500).send('Error al eliminar');
+      });
+  }
+  
+  module.exports = {
+    get,
+    getById,
+    create,
+    update,
+    destroy
+  };
+​
+NewController.js
+const { New } = require('../models/NewModel')
+
+const get = (request, response) => {
+    const { titulo, activo } = request.query
+    const filters = {}
+
+    if (titulo) {
+        filters.titulo = titulo
+    }
+
+    if (activo) {
+        filters.activo = activo
+    }
+
+    New.findAll({
+        where: filters
+    })
+        .then(entities => {
+            response.json(entities);
+        })
+        .catch(err => {
+            console.log(err)
+            response.status(500).send('Error consultando los datos');
+        })
+}
+
+const getById = (request, response) => {
+    const id = request.params.id;
+    New.findByPk(id)
+
+        .then(entitie => {
+            if (entitie) {
+                response.json(entitie);
+            }
+            else {
+                response.status(404).send('Recurso no encontrado')
+            }
+        })
+        .catch(err => {
+            response.status(500).send('Error al consultar el dato');
+        })
+}
+
+const create = (request, response) => {
+    New.create(request.body).then(
+        newEntitie => {
+            response.status(201).json(newEntitie)
+        }
+    )
+        .catch(err => {
+            response.status(500).send('Error al crear');
+        })
+}
+
+const update = (request, response) => {
+    const id = request.params.id;
+    New.update(
+        request.body
+        , {
+            where: {
+                id: id
+            }
+        }
+    )
+        .then(numRowsUpdated => {
+            response.status(200).send(`${numRowsUpdated} registro actualizado`);
+        })
+        .catch(err => {
+            response.status(500).send('Error al actualizar');
+        });
+}
+
+const destroy = (request, response) => {
+    const id = request.params.id;
+    New.destroy({
+        where: {
+            id: id
+        }
+    })
+        .then(numRowsDeleted => {
+            response.status(200).send(`${numRowsDeleted} registro eliminado`);
+        })
+        .catch(err => {
+            response.status(500).send('Error al eliminar');
+        });
+}
+
+module.exports = { get, getById, create, update, destroy };
+​
+StateController.js
+const { State } = require('../models/StateModel')
+const { validationResult } = require('express-validator');
+
+
+const get = (request, response) => {
+  
+  const { nombre, abreviacion } = request.query
+  const filters = {};
+
+  if (nombre) {
+    filters.nombre = nombre;
+  }
+  
+  if (abreviacion) {
+    filters.abreviacion = abreviacion;
+  }
+
+  State.findAll({
+    where: filters
+  })
+    .then(entities => {
+      response.json(entities);
+    })
+    .catch(err => {
+        console.log(err)
+      response.status(500).send('Error consultando los datos');
+    })
+
+}
+
+const getById = (request, response) => {
+  const id = request.params.id;
+  State.findByPk(id)
+    .then(entitie => {
+      if (entitie) {
+        response.json(entitie);
+      }
+      else {
+        response.status(404).send('Recurso no encontrado')
+      }
+    })
+    .catch(err => {
+      response.status(500).send('Error al consultar el dato');
+    })
+}
+
+const create = (request, response) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(422).json({ errors: errors.mapped() });
+  }
+  State.create(request.body).then(
+    newEntitie => {
+      response.status(201).json(newEntitie)
+    }
+  )
+    .catch(err => {
+      response.status(500).send('Error al crear');
+    })
+}
+
+const update = (request, response) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(422).json({ errors: errors.mapped() });
+  }
+  const id = request.params.id;
+  State.update(
+    request.body
+    , 
+    {
+      where: {
+        id: id
+      }
+    })
+    .then(numRowsUpdated => {
+      response.status(200).send(`${numRowsUpdated} registro actualizado`);
+    })
+    .catch(err => {
+      response.status(500).send('Error al actualizar');
+    });
+}
+
+const destroy = (request, response) => {
+  const id = request.params.id;
+  State.destroy(
+    {
+      where: {
+        id: id
+      }
+    }
+  ).then(numRowsDeleted => {
+    response.status(200).send(`${numRowsDeleted} registro eliminado`);
+  })
+    .catch(err => {
+      response.status(500).send('Error al eliminar');
+    });
+}
+
+module.exports = {
+  get,
+  getById,
+  create,
+  update,
+  destroy
+};
+​
+UserController.js
+const { User } = require('../models/UserModel')
+
+const get = (request, response) => {
+    const { nombre, apellidos, nick } = request.query
+    const filters = {}
+
+    if (nombre) {
+        filters.nombre = nombre
+    }
+    if (apellidos) {
+        filters.apellidos = apellidos
+    }
+    if (nick) {
+        filters.nick = nick
+    }
+
+    User.findAll({
+        where: filters
+    })
+        .then(entities => {
+            response.json(entities);
+        })
+        .catch(err => {
+            console.log(err)
+            response.status(500).send('Error consultando los datos');
+        })
+}
+
+
+const getById = (request, response) => {
+    const id = request.params.id;
+    User.findByPk(id)
+
+        .then(entitie => {
+            if (entitie) {
+                response.json(entitie);
+            }
+            else {
+                response.status(404).send('Recurso no encontrado')
+            }
+        })
+        .catch(err => {
+            response.status(500).send('Error al consultar el dato');
+        })
+}
+
+const create = (request, response) => {
+
+    User.create(request.body).then(
+        newEntitie => {
+            response.status(201).json(newEntitie)
+        }
+    )
+        .catch(err => {
+            response.status(500).send('Error al crear');
+        })
+}
+
+const update = (request, response) => {
+    const id = request.params.id;
+    User.update(
+        request.body
+        ,
+        {
+            where: {
+                id: id
+            }
+        })
+        .then(numRowsUpdated => {
+            response.status(200).send(`${numRowsUpdated} registro actualizado`);
+        })
+        .catch(err => {
+            response.status(500).send('Error al actualizar');
+        });
+}
+
+const destroy = (request, response) => {
+    const id = request.params.id;
+    User.destroy(
+        {
+            where: {
+                id: id
+            }
+        }
+    ).then(numRowsDeleted => {
+        response.status(200).send(`${numRowsDeleted} registro eliminado`);
+    })
+        .catch(err => {
+            response.status(500).send('Error al eliminar');
+        });
+}
+
+module.exports = {
+    get,
+    getById,
+    create,
+    update,
+    destroy
+};
+​
+ARCHIVOS RUTAS 
+CategoryRoute.js
+var express = require('express');
+
+const {get, getById, create, update, destroy}  = require('../controllers/CategoryController');
+const api = express.Router();
+
+api.get('/categorias', get);
+api.get('/categorias/:id', getById)
+api.post('/categorias', create)
+api.put('/categorias/:id', update)
+api.delete('/categorias/:id', destroy)
+
+
+module.exports = api;
+​
+NewRoute.js
+const express = require('express');
+
+const { get, getById, create, update, destroy } = require('../controllers/NewController');
+
+const api = express.Router();
+
+api.get('/noticias', get);
+api.get('/noticias/:id', getById)
+api.post('/noticias', create)
+api.put('/noticias/:id', update)
+api.delete('/noticias/:id', destroy)
+
+module.exports = api;
+​
+StateRoute.js
+var express = require('express');
+
+
+const {get, getById, create, update, destroy}  = require('../controllers/StateController');
+const {validatorStateRequire, validatorStateOptional} = require('../validators/StateValidator')
+const api = express.Router();
+
+api.get('/estados', get);
+api.get('/estados/:id', getById)
+api.post('/estados', validatorStateRequire, create)
+api.put('/estados/:id', validatorStateOptional, update)
+api.delete('/estados/:id', destroy)
+
+
+module.exports = api;
+​
+UserRoute.js
+var express = require('express');
+
+const { get, getById, create, update, destroy } = require('../controllers/UserController');
+const api = express.Router();
+
+api.get('/usuarios', get);
+api.get('/usuarios/:id', getById)
+api.post('/usuarios', create)
+api.put('/usuarios/:id', update)
+api.delete('/usuarios/:id', destroy)
+
+
+module.exports = api;
+​
+app.js
+const express = require('express')
+const app = express();
+const PORT = 3000
+
+app.use(express.json());
+
+//Exportar Rutas
+const profile_routes = require('./routes/ProfileRoute');
+const state_routes = require('./routes/StateRoute');
+const category_routes = require('./routes/CategoryRoute');
+const new_routes = require('./routes/NewRoute');
+const user_routes = require('./routes/UserRoute');
+
+
+
+//Usar las rutas
+app.use('/api', profile_routes, state_routes, category_routes, new_routes, user_routes)
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+​
+6.3 Aplicando las relaciones en nuestros controladores
+El parámetro include se utiliza en los métodos de consulta para obtener registros, como findAll, findByPk, findOne , nos ayuda a especificar las relaciones que deseas incluir en la consulta. Permite obtener los datos de los modelos relacionados junto con los datos del modelo principal en una sola consulta.
+El parámetro include acepta un array de objetos, donde cada objeto representa una relación que deseas incluir. Cada objeto de relación tiene las siguientes propiedades:
+model: Especifica el modelo de la relación que deseas incluir.
+as (opcional): Especifica el alias o nombre de la relación. Debe coincidir con el alias que has utilizado al configurar la relación en los modelos.
+attributes (opcional): Permite especificar los atributos específicos del modelo relacionado que deseas incluir en los resultados. Puedes utilizar un array de nombres de atributos para seleccionar los atributos específicos que deseas obtener.
+where (opcional): Permite aplicar condiciones adicionales a la relación incluida. Puedes utilizar cualquier operador de comparación o función de Sequelize para definir las condiciones.
+include (opcional): Permite anidar relaciones incluidas dentro de la relación principal. Esto es útil cuando tienes relaciones en cascada.
+Aquí hay un ejemplo de cómo usar el parámetro include en findAll para incluir la relación "categoria" del modelo New:
+const { Category } = require('../models/CategoryModel')
+
+const relations = [
+    { model: Category, attributes: ['id', 'nombre'], as: 'categoria'}    
+]
+
+const get = (request, response) => {
+    const { titulo, activo } = request.query
+    const filters = {}
+
+    if (titulo) {
+        filters.titulo = titulo
+    }
+
+    if (activo) {
+        filters.activo = activo
+    }
+
+    New.findAll({
+        where: filters,
+        include: relations
+    })
+        .then(entities => {
+            response.json(entities);
+        })
+        .catch(err => {
+            console.log(err)
+            response.status(500).send('Error consultando los datos');
+        })
+}
+​
+Actividad: Traer las demás relaciones del modelo New y las relaciones del modelo User
+Por lo tanto NewController.js
+const { New } = require('../models/NewModel')
+const { Category } = require('../models/CategoryModel')
+const { State } = require('../models/StateModel')
+const { User } = require('../models/UserModel')
+const { Profile } = require('../models/ProfileModel')
+
+const relationsUser = [
+    { model: Profile, attributes: ['id', 'nombre'], as: 'perfil' }
+]
+
+const relations = [
+    { model: Category, attributes: ['id', 'nombre', 'descripcion'], as: 'categoria' },
+    { model: State, attributes: ['id', 'nombre', 'abreviacion'], as: 'estado' },
+    { model: User, attributes: ['id', 'perfil_id', 'nick', 'nombre'], as: 'usuario', include: relationsUser }
+]
+
+const get = (request, response) => {
+    const { titulo, activo } = request.query
+    const filters = {}
+
+    if (titulo) {
+        filters.titulo = titulo
+    }
+
+    if (activo) {
+        filters.activo = activo
+    }
+
+    New.findAll({
+        where: filters,
+        include: relations
+    })
+        .then(entities => {
+            response.json(entities);
+        })
+        .catch(err => {
+            console.log(err)
+            response.status(500).send('Error consultando los datos');
+        })
+}
+
+const getById = (request, response) => {
+    const id = request.params.id;
+    New.findByPk(id, {
+        include: relations
+    })
+
+        .then(entitie => {
+            if (entitie) {
+                response.json(entitie);
+            }
+            else {
+                response.status(404).send('Recurso no encontrado')
+            }
+        })
+        .catch(err => {
+            response.status(500).send('Error al consultar el dato');
+        })
+}
+
+const create = (request, response) => {
+    New.create(request.body).then(
+        newEntitie => {
+            response.status(201).json(newEntitie)
+        }
+    )
+        .catch(err => {
+            response.status(500).send('Error al crear');
+        })
+}
+
+const update = (request, response) => {
+    const id = request.params.id;
+    New.update(
+        request.body
+        , {
+            where: {
+                id: id
+            }
+        }
+    )
+        .then(numRowsUpdated => {
+            response.status(200).send(`${numRowsUpdated} registro actualizado`);
+        })
+        .catch(err => {
+            response.status(500).send('Error al actualizar');
+        });
+}
+
+const destroy = (request, response) => {
+    const id = request.params.id;
+    New.destroy({
+        where: {
+            id: id
+        }
+    })
+        .then(numRowsDeleted => {
+            response.status(200).send(`${numRowsDeleted} registro eliminado`);
+        })
+        .catch(err => {
+            response.status(500).send('Error al eliminar');
+        });
+}
+
+module.exports = { get, getById, create, update, destroy };
+​
+UserController.js
+const { User } = require('../models/UserModel')
+const { Profile } = require('../models/ProfileModel')
+
+const relations = [
+    { model: Profile, attributes: ['id', 'nombre'], as: 'perfil' }
+]
+
+const get = (request, response) => {
+    const { nombre, apellidos, nick } = request.query
+    const filters = {}
+
+    if (nombre) {
+        filters.nombre = nombre
+    }
+    if (apellidos) {
+        filters.apellidos = apellidos
+    }
+    if (nick) {
+        filters.nick = nick
+    }
+
+    User.findAll({
+        where: filters,
+        include: relations
+    })
+        .then(entities => {
+            response.json(entities);
+        })
+        .catch(err => {
+            console.log(err)
+            response.status(500).send('Error consultando los datos');
+        })
+}
+
+
+const getById = (request, response) => {
+    const id = request.params.id;
+    User.findByPk(id, {
+        include: relations
+    })
+
+        .then(entitie => {
+            if (entitie) {
+                response.json(entitie);
+            }
+            else {
+                response.status(404).send('Recurso no encontrado')
+            }
+        })
+        .catch(err => {
+            response.status(500).send('Error al consultar el dato');
+        })
+}
+
+const create = (request, response) => {
+
+    User.create(request.body).then(
+        newEntitie => {
+            response.status(201).json(newEntitie)
+        }
+    )
+        .catch(err => {
+            response.status(500).send('Error al crear');
+        })
+}
+
+const update = (request, response) => {
+    const id = request.params.id;
+    User.update(
+        request.body
+        ,
+        {
+            where: {
+                id: id
+            }
+        })
+        .then(numRowsUpdated => {
+            response.status(200).send(`${numRowsUpdated} registro actualizado`);
+        })
+        .catch(err => {
+            response.status(500).send('Error al actualizar');
+        });
+}
+
+const destroy = (request, response) => {
+    const id = request.params.id;
+    User.destroy(
+        {
+            where: {
+                id: id
+            }
+        }
+    ).then(numRowsDeleted => {
+        response.status(200).send(`${numRowsDeleted} registro eliminado`);
+    })
+        .catch(err => {
+            response.status(500).send('Error al eliminar');
+        });
+}
+
+module.exports = {
+    get,
+    getById,
+    create,
+    update,
+    destroy
+};
+# 8**. Autenticación y autorización**
+
+La autenticación y autorización son dos aspectos fundamentales en el desarrollo de una API y juegan un papel clave en la seguridad y protección de los recursos y datos que se exponen a través de ella. Aquí te explico brevemente la importancia de cada uno:
+
+1. `Autenticación`: La autenticación se refiere al proceso de verificar la identidad de un usuario o una aplicación antes de permitirles el acceso a la API. Permite asegurarse de que solo las entidades autorizadas puedan utilizar los servicios proporcionados por la API. Al implementar un mecanismo de autenticación adecuado, se evita que usuarios no autorizados puedan acceder a recursos sensibles o realizar acciones no permitidas. Ejemplos comunes de métodos de autenticación incluyen el uso de tokens de acceso, claves de API, nombres de usuario y contraseñas, certificados digitales, etc.
+2. `Autorización`: Una vez que un usuario o una aplicación ha sido autenticado con éxito, la autorización determina qué acciones y recursos específicos están permitidos para ese usuario o aplicación en particular. La autorización se ocupa de establecer los niveles de acceso y los permisos necesarios para realizar determinadas operaciones. Por ejemplo, una API puede definir diferentes roles (administrador, usuario regular, invitado) y asignar permisos a cada uno de ellos. Esto permite controlar quién puede leer, escribir, modificar o eliminar datos en la API. La autorización adecuada ayuda a garantizar la integridad de los datos y la protección de la información confidencial.
+
+En conjunto, la autenticación y la autorización son esenciales para proteger los recursos y datos expuestos a través de una API. Al implementar adecuadamente estos mecanismos de seguridad, se establece una capa de protección que reduce el riesgo de accesos no autorizados, manipulación indebida de datos y otros ataques maliciosos. Además, proporcionan una forma de rastrear y auditar las acciones realizadas en la API, lo que es fundamental para mantener la integridad y la confianza en el sistema.
+
+## 8.1 JSON Web Token
+
+JSON Web Token (JWT) es un estándar abierto (RFC 7519) que define un formato compacto y seguro para transmitir información entre dos partes de forma confiable. Un JWT es un objeto JSON que consta de tres partes separadas por puntos y codificadas en Base64 URL:
+
+1. `Encabezado (Header):` Contiene información sobre el tipo de token y el algoritmo de firma utilizado. Por ejemplo:
+    
+    ```json
+    jsonCopy code
+    {
+      "alg": "HS256",
+      "typ": "JWT"
+    }
+    ```
+    
+    En este caso, se utiliza el algoritmo HMAC-SHA256 (HS256) para firmar el token.
+    
+2. `Carga útil (Payload):` Es donde se incluye la información que se desea transmitir de manera segura. Puede contener cualquier dato JSON válido. Algunos de los campos comunes en la carga útil incluyen el identificador del usuario, roles, permisos u otra información relevante. Por ejemplo:
+    
+    ```json
+    {
+      "sub": "1234567890",
+      "name": "John Doe",
+      "admin": true
+    }
+    ```
+    
+3. `Vencimiento (Expiration):` Nos sirve para definir una fecha y hora en la cual el token deja de ser válido. Esto brinda un mecanismo para controlar la duración de la sesión y restringir el tiempo durante el cual un token puede ser utilizado para acceder a recursos protegidos.
+    
+    El vencimiento de un JWT se especifica en la carga útil (payload) utilizando el campo "exp" (expiration time) y se representa como un valor numérico llamado "Unix timestamp". Este valor representa la cantidad de segundos transcurridos desde el 1 de enero de 1970 a las 00:00:00 UTC (conocido como "Epoch time").
+    
+    Por ejemplo, en la carga útil de un JWT, se puede incluir el campo "exp" de la siguiente manera:
+    
+    ```json
+    {
+      "sub": "1234567890",
+      "name": "John Doe",
+      "exp": 1678425600
+    }
+    ```
+    
+    En este caso, el valor "1678425600" representa una fecha y hora específica en formato Unix timestamp. Cuando un receptor del token recibe este JWT, puede verificar si el token está dentro de su período de validez comparando el valor "exp" con la fecha y hora actual.
+    
+4. `Firma (Signature):` Se utiliza para verificar la integridad del token y asegurar que no ha sido manipulado. La firma se crea combinando el encabezado codificado en Base64 URL, la carga útil codificada en Base64 URL y una clave secreta compartida. La firma se genera utilizando el algoritmo especificado en el encabezado. Por ejemplo:
+    
+    ```
+    scssCopy code
+    HMACSHA256(
+      base64UrlEncode(header) + "." +
+      base64UrlEncode(payload),
+      secret)
+    ```
+    
+    Donde **`secret`** es una clave secreta que solo conocen el emisor y el receptor del token.
+    
+    El JWT se envía a través de las solicitudes HTTP en los encabezados de autorización, generalmente en el formato **`Bearer <token>`**. El receptor del token puede verificar su validez utilizando la clave secreta compartida y comparando la firma calculada con la firma proporcionada en el token recibido.
+    
+
+Los JWT son ampliamente utilizados en aplicaciones web y APIs como mecanismo de autenticación y autorización. Al ser autocontenidos y firmados, no es necesario almacenar el estado del usuario en el servidor, lo que los hace escalables y eficientes. Además, los JWT pueden incluir información adicional en la carga útil, lo que permite transmitir datos relevantes junto con la autenticación.
+
+Sin embargo, es importante tener en cuenta que los JWT no son cifrados, por lo que no se deben incluir datos sensibles en la carga útil. Además, se deben tomar precauciones para proteger la clave secreta utilizada para firmar los tokens y evitar que caigan en manos equivocadas.
+
+### 8.1.2 Funciones principales de JWT
+
+Las funciones principales en la biblioteca **`jsonwebtoken`** para la generación y verificación de JWT son **`sign`** y **`verify`**. Aquí te explico cómo se componen cada una de ellas:
+
+1. La función **`sign`** se utiliza para generar un nuevo JWT firmado. Acepta tres parámetros: el payload (carga útil) que deseas incluir en el JWT, una clave secreta para firmar el token y opcionalmente opciones adicionales. Su estructura general es la siguiente:
+    
+    ```jsx
+    jwt.sign(payload, secretOrPrivateKey, [options, callback])
+    ```
+    
+- **`payload`**: Es un objeto JSON que contiene la información que deseas transmitir de manera segura en el JWT.
+- **`secretOrPrivateKey`**: Es la clave secreta compartida o la clave privada utilizada para firmar el token. Puede ser una cadena de caracteres o una clave RSA privada.
+- **`options`** (opcional): Son opciones adicionales que se pueden especificar, como el algoritmo de firma, el tiempo de expiración, el emisor, etc.
+- **`callback`**: Es una función opcional que se puede utilizar en lugar de retornar una promesa. El callback se ejecutará una vez que el JWT se haya generado.
+
+La función **`sign`** retorna una cadena que representa el JWT firmado.
+
+1. La función **`verify`** se utiliza para verificar la validez y autenticidad de un JWT. Acepta tres parámetros: el JWT que deseas verificar, la clave secreta o clave pública correspondiente y opcionalmente opciones adicionales. Su estructura general es la siguiente:
+    
+    ```
+    jwt.verify(token, secretOrPublicKey, [options, callback])
+    ```
+    
+    - **`token`**: Es la cadena del JWT que se va a verificar.
+    - **`secretOrPublicKey`**: Es la clave secreta compartida o la clave pública utilizada para verificar la firma del token. Puede ser una cadena de caracteres o una clave RSA pública.
+    - **`options`** (opcional): Son opciones adicionales que se pueden especificar, como el algoritmo de firma, la audiencia, el emisor, etc.
+    - **`callback`**: Es una función opcional que se puede utilizar en lugar de retornar una promesa. El callback se ejecutará una vez que se haya verificado el JWT.
+
+La función **`verify`** retorna el payload (carga útil) del JWT si la firma es válida y no ha expirado. Si la firma es inválida o el JWT ha expirado, se generará una excepción.
+
+Es importante tener en cuenta que las opciones disponibles pueden variar dependiendo de la versión de la biblioteca **`jsonwebtoken`** que estés utilizando. Te recomiendo consultar la documentación oficial para conocer las opciones específicas y su uso adecuado.
+
+En resumen, la función **`sign`** se utiliza para generar un nuevo JWT firmado con un payload específico, mientras que la función **`verify`** se utiliza para verificar la validez de un JWT existente y obtener su carga útil si es válido. Ambas funciones son fundamentales para trabajar con JWT y asegurar la autenticidad y validez de los tokens utilizados en una aplicación.
+
+## 8.2 Implementando JWT en nuestra API
+
+**Paso 1:** Instalar JSON Web Token
+
+```powershell
+npm install jsonwebtoken
+```
+
+**Paso 2:** Antes de proceder con las implementaciones de JWT es importante crear un servicio de login y registro para nuestra API
+
+***Actividad: Crea un controlador que permita logear (regresar un código de estado 201 con un mensaje que diga “Login con éxito” cuando las credenciales son correctas correo y contraseña y un mensaje de “Sin autorización” con el código de estado 401 en dado caso que no lo sean)  y un método que permita registrar a un usuario dentro de nuestra API (el metodo no debe solicitar el perfil_id si no que directamente nosotros le mandaremos el 2 ya que será nuestro endpoint abierto para los contribuidores), el archivo se debe llamar `AuthController.js` así como su archivo de enrutamiento `AuthRoute.js`. Para poder realizar este ejercicio aplica tus conocimientos en consultas con Sequelize, así como las validaciones correspondientes en un archivo llamado `AuthValidator.js` , ten en cuenta los endpoints para estos métodos definidos en el módulo 4.1***
+
+AuthController.js
+
+```jsx
+const { User } = require('../models/UserModel')
+const { validationResult } = require('express-validator');
+
+const login = (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.mapped() });
+    }
+    User.findOne({
+        where: {
+            correo: request.body.correo,
+            contraseña: request.body.contraseña,
+            activo: true
+        },
+    }).then(entitie => {
+            if (entitie) {
+                response.status(201).json({message: "Login con éxito"});
+            }
+            else {
+                response.status(401).json({message: "Sin autorización"});
+
+            }
+        })
+        .catch(err => {
+            response.status(500).send('Error al consultar el dato');
+        })
+}
+
+const register = (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.mapped() });
+    }
+    request.body.perfil_id = 2
+    request.body.status = true
+
+    User.create(request.body).then(
+        newEntitie => {
+            response.status(201).json(newEntitie)
+        }
+    )
+        .catch(err => {
+            response.status(500).send('Error al crear');
+        })
+}
+
+module.exports = {
+    login,
+    register,
+};
+```
+
+AuthValidator.js
+
+```jsx
+const { check } = require('express-validator');
+const { User } = require('../models/UserModel');
+
+const validatorLogin = [
+    check('correo').notEmpty().withMessage('El campo correo es requerido')
+        .isEmail().withMessage('El campo correo debe ser un correo válido'),
+
+    check('contraseña').notEmpty().withMessage('El campo contraseña es requerido')
+]
+
+const validatorRegister = [
+    check('nombre').notEmpty().withMessage('El campo nombre es obligatorio')
+        .isString().withMessage('El campo nombre debe ser texto')
+        .isLength({ min: 2, max: 100 }).withMessage('El campo debe tener entre 2 y 100 caracteres'),
+
+    check('apellidos').notEmpty().withMessage('El campo apellidos es obligatorio')
+        .isString().withMessage('El campo apellidos debe ser texto')
+        .isLength({ min: 2, max: 100 }).withMessage('El campo apellidos debe tener entre 2 y 100 caracteres'),
+
+    check('nick').notEmpty().withMessage('El campo nick es obligatorio')
+        .isString().withMessage('El campo nick debe ser texto')
+        .isLength({ min: 2, max: 20 }).withMessage('El campo nick debe tener entre 2 y 20 caracteres'),
+
+    check('correo').notEmpty().withMessage('El campo correo es obligatorio')
+        .isEmail().withMessage('El campo correo debe ser un correo valido')
+        .isLength({ min: 2, max: 255 }).withMessage('El campo correo debe tener entre 2 y 255 caracteres')
+        .custom((value, { request }) => {
+            return User.findOne({ where: { correo: value } })
+                .then((user) => {
+                    if (user) {
+                        throw new Error('Ya existe un usuario con este correo ')
+                    }
+                })
+        }),
+
+    check('contraseña').notEmpty().withMessage('El campo contraseña es obligatorio')
+        .isString().withMessage('El campo contraseña debe ser texto')
+        .isLength({ min: 8, max: 255 }).withMessage('El campo correo debe tener entre 8 y 255 caracteres'),
+]
+
+module.exports = {
+    validatorLogin,
+    validatorRegister
+}
+```
+
+AuthRoute.js
+
+```jsx
+var express = require('express');
+
+const { login, register, } = require('../controllers/AuthController');
+const { validatorLogin, validatorRegister } = require('../validators/AuthValidator');
+const api = express.Router();
+
+api.post('/auth/login', validatorLogin, login);
+api.post('/auth/registro/', validatorRegister, register)
+
+module.exports = api;
+```
+
+app.js
+
+```jsx
+const express = require('express')
+const app = express();
+const PORT = 3000
+
+app.use(express.json());
+
+//Exportar Rutas
+const profile_routes = require('./routes/ProfileRoute');
+const state_routes = require('./routes/StateRoute');
+const category_routes = require('./routes/CategoryRoute');
+const new_routes = require('./routes/NewRoute');
+const user_routes = require('./routes/UserRoute');
+const auth_routes = require('./routes/AuthRoute')
+
+//Usar las rutas
+app.use('/api', profile_routes, state_routes, category_routes, new_routes, user_routes, auth_routes)
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+```
+
+**Paso 3:** Una vez que hemos creado nuestro controlador de login y registro es momento de implementar JWT al momento de que un usuario se logea, para eso generaremos un token el cual se le devolverá en la respuesta de nuestra solicitud, teniendo el siguiente código.
+
+AuthController.js
+
+```jsx
+const { User } = require('../models/UserModel')
+const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
+
+const login = (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.mapped() });
+    }
+    User.findOne({
+        where: {
+            correo: request.body.correo,
+            contraseña: request.body.contraseña,
+            activo: true
+        },
+        attributes: ['id', 'perfil_id', 'nombre', 'apellidos', 'nick']
+    }).then(usuario => {
+        if (usuario) {
+            const token = jwt.sign({ usuario }, 'mi_llave_secreta', { expiresIn: '24h' });
+            response.status(201).json({ message: "Login con éxito", token: token });
+        }
+        else {
+            response.status(401).json({ message: "Sin autorización" });
+
+        }
+    })
+        .catch(err => {
+            response.status(500).send('Error al consultar el dato');
+        })
+}
+
+const register = (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.mapped() });
+    }
+    request.body.perfil_id = 2
+    request.body.status = true
+
+    User.create(request.body).then(
+        newEntitie => {
+            response.status(201).json(newEntitie)
+        }
+    )
+        .catch(err => {
+            response.status(500).send('Error al crear');
+        })
+}
+
+module.exports = {
+    login,
+    register,
+};
+```
+
+## 8.3 Protección de nuestros Endpoints con JWT
+
+La protección de rutas en una API se refiere a la implementación de medidas de seguridad para controlar y restringir el acceso a ciertos endpoints o recursos de la API. Esto se hace para garantizar que solo los usuarios autorizados puedan acceder y realizar ciertas operaciones en esos endpoints.
+
+La protección de rutas se utiliza para prevenir accesos no autorizados y garantizar la confidencialidad, integridad y disponibilidad de los datos y funcionalidades expuestos a través de la API. Al implementar la protección de rutas, se pueden aplicar diferentes técnicas y estrategias de seguridad, como la autenticación y la autorización.
+
+Ahora que ya sabemos que es la protección de rutas, vamos a ver como protegerlas haciendo uso de JWT con el token que generamos en el submódulo anterior.
+
+**Paso 1:** En la raíz de nuestro proyecto, creamos una carpeta que se llame `middlewares`
+
+**Paso 2:** Dentro de la carpeta que acabamos de crear, creamos un archivo llamado `jwt.js`, en este implementaremos todos los middlewares correspondientes a JWT para la protección de nuestras rutas
+
+**Paso 3:** Dentro del archivo pegamos el siguiente código:
+
+```jsx
+const jwt = require('jsonwebtoken');
+
+const authenticateAdmin = (req, res, next) => {
+    const authorization_header = req.headers.authorization;
+    const token = authorization_header.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send({ message: 'No se proporcionó un token' });
+    }
+
+    jwt.verify(token, 'mi_llave_secreta', (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Sin autorización' });
+        }
+        if (decoded.usuario.perfil_id === 1) {
+            next();
+        }
+        else {
+            return res.status(403).send({ message: 'Sin autorización' });
+        }
+
+    });
+}
+
+module.exports = {
+    authenticateAdmin
+};
+```
+
+La función llamada **`authenticateAdmin`** es un middleware de autenticación que nos sirve para verificar si un usuario tiene permisos de administrador.
+
+1. Se define la función **`authenticateAdmin`** con tres parámetros: **`req`**, **`res`** y **`next`**. Estos parámetros representan el objeto de solicitud (request), objeto de respuesta (response) y una función de siguiente middleware, respectivamente.
+2. Se obtiene el encabezado de autorización de la solicitud mediante **`req.headers.authorization`**. El encabezado de autorización suele contener un token de autenticación.
+3. **`const token = authorization_header && authorization_header.split(' ')[1];`** Esta línea utiliza el operador lógico **`&&`** para comprobar si **`authorization_header`** tiene un valor. Si **`authorization_header`** no es **`null`**, **`undefined`** o una cadena vacía, entonces se realiza la siguiente operación. Esto evita errores si el encabezado de autorización no está presente en la solicitud.
+    
+    Luego, se utiliza el método **`split(' ')`** para dividir el valor del encabezado de autorización en un array de cadenas, utilizando el espacio como separador. La función **`split`** divide una cadena en partes más pequeñas y devuelve un array con esas partes. En este caso, se asume que el token de autenticación está en la segunda posición del array resultante, por eso se accede al índice **`[1]`**.
+    
+    Por ejemplo, si **`authorization_header`** es **`"Bearer abcdefg123456"`**, el resultado de **`authorization_header.split(' ')`** será **`["Bearer", "abcdefg123456"]`**, y **`token`** tomará el valor **`"abcdefg123456"`**.
+    
+4. Se verifica si no se proporcionó ningún token. Si no hay un token, se envía una respuesta de estado 401 (no autorizado) con un mensaje indicando que no se proporcionó un token.
+5. Se utiliza **`jwt.verify`** para verificar la validez del token. Toma el token, una clave secreta ("mi_llave_secreta" en este caso) y una función de devolución de llamada como argumentos. Si hay un error al verificar el token, se envía una respuesta de estado 403 (prohibido) con un mensaje indicando que no hay autorización.
+6. Si el token se verifica correctamente, la función de devolución de llamada se ejecuta y recibe dos argumentos: **`err`** y **`decoded`**. **`err`** contiene información sobre cualquier error que ocurra durante la verificación, y **`decoded`** contiene la información decodificada del token.
+7. Se verifica si el perfil del usuario (contenido en **`decoded.usuario.perfil_id`**) es igual a 1. Si es así, se llama a **`next()`** para pasar la solicitud al siguiente middleware. Esto indica que el usuario tiene los permisos de administrador necesarios.
+8. Si el perfil del usuario no es igual a 1, se envía una respuesta de estado 403 (prohibido) con un mensaje indicando que no tiene autorización.
+
+Ahora crearemos un Middleware para verificar que el token es valido sin importar el tipo de perfil, nuestro archivo jwt.js debe quedar de la siguiente manera
+
+```jsx
+const jwt = require('jsonwebtoken');
+
+const authenticateAdmin = (req, res, next) => {
+    const authorization_header = req.headers.authorization;
+    const token = authorization_header && authorization_header.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send({ message: 'No se proporcionó un token' });
+    }
+
+    jwt.verify(token, 'mi_llave_secreta', (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Sin autorización' });
+        }
+        if (decoded.usuario.perfil_id === 1) {
+            next();
+        }
+        else {
+            return res.status(403).send({ message: 'Sin autorización' });
+        }
+
+    });
+}
+
+const authenticateAny = (req, res, next) => {
+    const authorization_header = req.headers.authorization;
+    const token = authorization_header && authorization_header.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send({ message: 'No se proporcionó un token' });
+    }
+
+    jwt.verify(token, 'mi_llave_secreta', (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Sin autorización' });
+        }
+        if (decoded) {
+            next();
+        }
+        else {
+            return res.status(403).send({ message: 'Sin autorización' });
+        }
+
+    });
+}
+
+module.exports = {
+    authenticateAdmin,
+    authenticateAny
+};
+```
+
+**Paso 4:** Proteger las rutas donde consideremos que solo un administrador puede acceder y donde cualquier tipo de usuario pueda acceder
+
+CategoryRoute.js
+
+```jsx
+var express = require('express');
+
+const {get, getById, create, update, destroy}  = require('../controllers/CategoryController');
+const { validatorCategoryCreate, validatorCategoryUpdate } = require('../validators/CategoryValidator');
+const { authenticateAdmin } = require('../middlewares/jwt')
+
+const api = express.Router();
+
+api.get('/categorias', get);
+api.get('/categorias/:id', getById)
+api.post('/categorias', authenticateAdmin, validatorCategoryCreate, create)
+api.put('/categorias/:id', authenticateAdmin, validatorCategoryUpdate, update)
+api.delete('/categorias/:id', authenticateAdmin, destroy)
+
+module.exports = api;
+```
+
+NewRoute.js
+
+```jsx
+const express = require('express');
+
+const { get, getById, create, update, destroy } = require('../controllers/NewController');
+const { validatorNewCreate, validatorNewUpdate } = require('../validators/NewValidator');
+const { authenticateAdmin, authenticateAny } = require('../middlewares/jwt')
+
+const api = express.Router();
+
+api.get('/noticias', get);
+api.get('/noticias/:id', getById)
+api.post('/noticias', authenticateAny, validatorNewCreate, create)
+api.put('/noticias/:id', authenticateAny, validatorNewUpdate, update)
+api.delete('/noticias/:id', authenticateAny,  destroy)
+
+module.exports = api;
+```
+
+ProfileRoute.js
+
+```jsx
+var express = require('express');
+
+const {get, getById, }  = require('../controllers/ProfileController');
+const { authenticateAdmin } = require('../middlewares/jwt')
+
+const api = express.Router();
+
+api.get('/perfiles', get);
+api.get('/perfiles/:id', getById)
+
+module.exports = api;
+```
+
+StateRoute.js
+
+```jsx
+var express = require('express');
+
+const {get, getById, create, update, destroy}  = require('../controllers/StateController');
+const {validatorStateRequire, validatorStateOptional} = require('../validators/StateValidator')
+const { authenticateAdmin } = require('../middlewares/jwt')
+
+const api = express.Router();
+
+api.get('/estados', get);
+api.get('/estados/:id', getById)
+api.post('/estados', authenticateAdmin, validatorStateRequire, create)
+api.put('/estados/:id', authenticateAdmin, validatorStateOptional, update)
+api.delete('/estados/:id', authenticateAdmin, destroy)
+
+module.exports = api;
+```
+
+UserRoute.js
+
+```jsx
+var express = require('express');
+
+const { get, getById, create, update, destroy } = require('../controllers/UserController');
+const { validatorUserCreate, validatorUserUpdate } = require('../validators/UserValidator');
+const { authenticateAdmin } = require('../middlewares/jwt')
+
+const api = express.Router();
+
+api.get('/usuarios', authenticateAdmin, get);
+api.get('/usuarios/:id', authenticateAdmin, getById)
+api.post('/usuarios', authenticateAdmin, validatorUserCreate, create)
+api.put('/usuarios/:id',authenticateAdmin, validatorUserUpdate, update)
+api.delete('/usuarios/:id', authenticateAdmin, destroy)
+
+module.exports = api;
+```
+
+# 9**. Puliendo nuestra API**
+
+En este modulo vamos a agregar unas partes importantes a nuestra API para tener un servicio mas robusto y sin errores antes de pasar a subir nuestra API a un servidor.
+
+Lo primero que modificaremos, es agregar el uso de los `cors` esto para implementar que cualquier cliente pueda hacer petición a nuestro servidor una vez que despleguemos nuestra API. 
+
+Instalar la paquetería:
+
+```powershell
+npm install cors
+```
+
+Ahora nuestro archivo `app.js` quedaría de la siguiente manera: 
+
+```jsx
+const express = require('express')
+const app = express();
+const cors = require('cors');
+const PORT = 3000
+
+app.use(cors());
+
+app.use(express.json());
+
+//Exportar Rutas
+const profile_routes = require('./routes/ProfileRoute');
+const state_routes = require('./routes/StateRoute');
+const category_routes = require('./routes/CategoryRoute');
+const new_routes = require('./routes/NewRoute');
+const user_routes = require('./routes/UserRoute');
+const auth_routes = require('./routes/AuthRoute');
+
+//Usar las rutas
+app.use('/api', profile_routes, state_routes, category_routes, new_routes, user_routes, auth_routes)
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+```
+
+Ahora para que nosotros podamos insertar imagenes o textos largos como es el caso del campo imagen en base64 para nuestras noticias, es importante definir en el middleware de `express.json`, el peso máximo a recibir, para eso  nuestro archivo `app.js` quedaría así:
+
+```jsx
+const express = require('express')
+const app = express();
+const cors = require('cors');
+const PORT = 3000
+
+app.use(cors());
+
+app.use(express.json({limit: '5mb'}))
+
+//Exportar Rutas
+const profile_routes = require('./routes/ProfileRoute');
+const state_routes = require('./routes/StateRoute');
+const category_routes = require('./routes/CategoryRoute');
+const new_routes = require('./routes/NewRoute');
+const user_routes = require('./routes/UserRoute');
+const auth_routes = require('./routes/AuthRoute');
+
+//Usar las rutas
+app.use('/api', profile_routes, state_routes, category_routes, new_routes, user_routes, auth_routes)
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+```
+
+Instalar un paquete para lector de archivos .env
+
+```powershell
+npm install dotenv
+```
+
+Crear un archivo en la raíz de nuestro proyecto llamado `config.js` , que tendrá lo siguiente:
+
+```jsx
+const PORT = process.env.PORT || 3000
+
+const DB_HOST = process.env.DB_HOST || 'localhost'
+
+const DB_USER = process.env.DB_USER || 'root'
+
+const DB_PASSWORD = process.env.DB_PASSWORD || ''
+
+const DB_NAME = process.env.DB_NAME || 'db_news'
+
+module.exports = { PORT, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME };
+```
+
+Nuestro archivo `config.db.js` quedará de la siguiente manera:
+
+```jsx
+const Sequelize = require('sequelize')
+require('dotenv').config();
+const { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER } = require('./config.js')
+
+const connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
+    dialect: 'mysql',
+})
+
+connection.authenticate()
+    .then(() => {
+        console.log('Se ha establecido conexión con la base de datos')
+    })
+    .catch(err => {
+        console.log('No se pudo establecer conexión con la base de datos')
+    })
+
+module.exports = { connection };
+```
+
+Nuestro archivo app.js quedará de la siguiente manera:
+
+```jsx
+const express = require('express')
+const app = express();
+const cors = require('cors');
+const { PORT } = require("./config");
+
+app.use(cors());
+
+app.use(express.json({limit: '50mb'}))
+
+//Exportar Rutas
+const profile_routes = require('./routes/ProfileRoute');
+const state_routes = require('./routes/StateRoute');
+const category_routes = require('./routes/CategoryRoute');
+const new_routes = require('./routes/NewRoute');
+const user_routes = require('./routes/UserRoute');
+const auth_routes = require('./routes/AuthRoute');
+
+//Usar las rutas
+app.use('/api', profile_routes, state_routes, category_routes, new_routes, user_routes, auth_routes)
+
+app.listen(PORT, () => {
+    console.log('Servidor escuchando en el puerto ' + PORT);
+});
+
+module.exports = app;
+```
+
+# **10. Despliegue en producción**
+
+Ahora que hemos implementado y preparado nuestra API para estar en un entorno de producción, procederemos a desplegar nuestra API en un servidor, para este caso utilizaremos [render.com](http://render.com) que es una plataforma en la nube que ofrece servicios de computación y alojamiento para aplicaciones y sitios web. Permite a los desarrolladores y equipos desplegar sus aplicaciones y proyectos en la nube de manera sencilla y escalable. [Render.com](http://render.com/) se encarga de administrar y provisionar los recursos necesarios para ejecutar y mantener las aplicaciones, lo que permite a los desarrolladores centrarse en la construcción de su código sin tener que preocuparse por la infraestructura subyacente. Ofrece soporte para diferentes lenguajes de programación, bases de datos y herramientas populares de desarrollo, y también ofrece funciones como escalado automático, integración continua y despliegue continuo (CI/CD), y certificados SSL gratuitos.
+
+## Paso 1
+
+Tener instalado git en nuestra computadora, si no lo tenemos, seguir los siguientes pasos:
+
+1. Ve al sitio web oficial de Git en [**https://git-scm.com/downloads**](https://git-scm.com/downloads).
+2. En la página de descargas, se mostrará automáticamente la versión de Git recomendada para tu sistema operativo (Windows). Haz clic en el enlace "Download for Windows" para iniciar la descarga.
+3. Se descargará un archivo de instalación de Git. Una vez que se complete la descarga, haz doble clic en el archivo para ejecutarlo.
+4. Aparecerá un asistente de instalación. Puedes aceptar las opciones predeterminadas y hacer clic en "Next" en cada paso, a menos que desees personalizar la configuración.
+5. En la pantalla "Select Components", puedes elegir los componentes que deseas instalar. Es recomendable dejar las opciones predeterminadas seleccionadas, a menos que tengas un motivo específico para cambiarlas. Haz clic en "Next" cuando estés listo.
+6. En la pantalla "Choosing the default editor used by Git", puedes elegir el editor de texto que prefieras usar con Git. El editor predeterminado es Vim, pero si no estás familiarizado con él, puedes seleccionar "Use the Nano editor by default" o elegir otro editor de la lista. Luego, haz clic en "Next".
+7. En la pantalla "Adjusting your PATH environment", selecciona "Git from the command line and also from 3rd-party software" para agregar Git al PATH del sistema. Esto te permitirá ejecutar comandos de Git desde cualquier ubicación en la línea de comandos. Luego, haz clic en "Next".
+8. En la pantalla "Choosing HTTPS transport backend", selecciona "Use the OpenSSL library" y haz clic en "Next".
+9. En la pantalla "Configuring the line ending conversions", selecciona "Checkout Windows-style, commit Unix-style line endings" y haz clic en "Next".
+10. En la pantalla "Configuring the terminal emulator to use with Git Bash", selecciona "Use MinTTY" y haz clic en "Next".
+11. En la pantalla "Configuring extra options", puedes marcar las casillas según tus preferencias o dejarlas sin marcar. Luego, haz clic en "Next".
+12. En la pantalla "Choosing the default behavior of 'git pull'", selecciona "Default" y haz clic en "Next".
+13. En la pantalla "Configuring experimental options", puedes marcar las casillas según tus preferencias o dejarlas sin marcar. Luego, haz clic en "Install".
+14. La instalación comenzará y se mostrará una barra de progreso. Una vez completada la instalación, haz clic en "Finish".
+
+Después de completar estos pasos, Git estará instalado en tu sistema Windows. Puedes abrir la línea de comandos y ejecutar comandos de Git o utilizar una interfaz gráfica de usuario como Git Bash o Git GUI para interactuar con Git.
+
+## Paso 2
+
+Iniciar sesión en nuestra cuenta de GitHub desde el navegador, si no tenemos una cuenta de GitHub, seguir los siguientes pasos:
+
+1. Abre tu navegador web y ve a la página principal de GitHub en **`https://github.com`**.
+2. Haz clic en el botón "Sign up" o "Unirse" que se encuentra en la esquina superior derecha de la página.
+3. En la siguiente página, deberás completar el formulario de registro. Puedes optar por registrarte con tu dirección de correo electrónico o con tu cuenta de Google.
+    - Si eliges registrarte con tu dirección de correo electrónico, ingresa tu dirección de correo electrónico en el campo provisto y haz clic en "Sign up for GitHub" o "Unirse a GitHub".
+    - Si eliges registrarte con tu cuenta de Google, haz clic en el botón "Continue with Google" o "Continuar con Google" y sigue las instrucciones para iniciar sesión en tu cuenta de Google.
+4. Si te registras con tu dirección de correo electrónico, completa los campos restantes del formulario, incluyendo la contraseña que deseas utilizar para tu cuenta. Luego, haz clic en "Create account" o "Crear cuenta".
+5. A continuación, se te pedirá que elijas un plan. GitHub ofrece opciones tanto gratuitas como de pago. Puedes optar por la opción gratuita haciendo clic en "Choose Free" o "Elegir Gratis". Si deseas una opción de pago, selecciona el plan que mejor se adapte a tus necesidades.
+6. Después de seleccionar un plan, se te pedirá que completes un breve cuestionario sobre tu experiencia y propósito en GitHub. Puedes responder las preguntas o saltar esta sección haciendo clic en "Submit" o "Enviar" sin responder.
+7. ¡Listo! Ahora tienes tu cuenta de GitHub. Se te redirigirá a tu página de inicio, donde podrás comenzar a explorar los repositorios y utilizar todas las funciones de GitHub.
+
+Recuerda verificar tu dirección de correo electrónico registrada para completar el proceso de registro y tener acceso completo a todas las funciones de GitHub.
+
+## Paso 3
+
+Crearemos un nuevo repositorio público en nuestra cuenta de GitHub, con el nombre `ApiNews`
+
+1. En la esquina superior derecha de la página, verás un ícono "+" en forma de signo de más. Haz clic en él y selecciona "New repository" o "Nuevo repositorio".
+2. Se abrirá la página "Create a new repository" o "Crear un nuevo repositorio". Aquí es donde puedes configurar los detalles de tu nuevo repositorio.
+3. En el campo "Repository name" o "Nombre del repositorio", escribe "ApiNews".
+4. Opcionalmente, puedes proporcionar una descripción breve del repositorio en el campo "Description" o "Descripción".
+5. Asegúrate de que la opción "Public" o "Público" esté seleccionada. Esto hará que el repositorio sea accesible para todos los usuarios de GitHub.
+6. Haz clic en el botón "Create repository" o "Crear repositorio" para crear el repositorio.
+
+## Paso 4
+
+Reiniciamos visual code y volvemos a abrir nuestro proyecto ApiNews, ejecutamos los siguientes comandos en la terminal.
+
+Crear un nuevo repositorio git
+
+```powershell
+git init
+```
+
+Asociar nuestro correo de nuestra cuenta de GitHub a nuestro correo (reemplazar según tu caso)
+
+```powershell
+git config user.email "[example@gmail.com](mailto:example@gmail.com)"
+```
+
+Asociar nuestro nombre de usuario de nuestra cuenta de GitHub a nuestro correo (reemplazar según tu caso)
+
+```powershell
+git config [user.name](http://user.name/) "example"
+```
+
+Crear un archivo en la raíz de nuestro proyecto con el siguiente nombre `.gitignore` que contendrá lo siguiente
+
+```powershell
+node_modules/
+```
+
+Subir en stage nuestros archivos
+
+```powershell
+git add .
+```
+
+Crear nuestro primer commit
+
+```powershell
+git commit -m “first commit”
+```
+
+Crear nuestra rama main
+
+```powershell
+git branch -M main
+```
+
+Asociar nuestro repositorio Git a nuestro repositorio en GitHub (reemplazar según el caso, este lo podemos encontrar en la página de nuestro repositorio GitHub)
+
+```powershell
+git remote add origin https://github.com/ExmapleUser/ApiNews.git
+```
+
+Subir nuestros archivos al repositorio
+
+```powershell
+git push -u origin main
+```
+
+Si todo va bien, ahora nuestro repositorio GitHub se debería ver de la siguiente manera
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/525251cf-e0e9-436c-99e6-dde55c91969b/Untitled.png)
+
+## Paso 5
+
+Nos dirigimos a [render.com](http://render.com) y damos click donde dice “Dashboard”
+
+Iniciamos sesión con nuestra cuenta de GitHub u autorizamos el permiso
+
+Damos click en “Complete Sign Up”
+
+Ingresamos a nuestro correo que teneos asociado en nuestra cuenta GitHub y verificamos
+
+Nos dirigimos a https://github.com/apps/render/installations/new y buscamos la opción que diga “Only Select repositories” y seleccionamos nuestro repositorio ApiNews
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/74116e5f-4c40-4553-859c-57031c661286/Untitled.png)
+
+Damos click en “Install”
+
+## Paso 6
+
+Nos dirigimos a https://api.clever-cloud.com/v2/session/login e iniciamos sesión con nuestra cuenta de GitHub
+
+Una vez dentro damos click en Add an organization > “Create” > “An add on”
+
+Entre todas las opciones de la ventana que nos aparece, buscamos la que dice “MySQL” le damos “Select”
+
+Seleccionamos el plan DEV y damos click en “Next”
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/87fe2692-7874-4fea-8e53-73db69320ce2/Untitled.png)
+
+Le ponemos de nombre “db_news” y seleccionamos la región de Canada, luego damos click en “Next”
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ed55af8e-507f-4d74-9cfc-a76e07ebf031/Untitled.png)
+
+## Paso 7
+
+Regresamos al Dashboard de render.com
+
+Damos click en “New” > “Web Service”
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fce79bd1-d1df-4049-a4c1-16ea447b30a0/Untitled.png)
+
+Conectamos nuestro repositorio ApiNews 
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bde3710c-efba-48af-bb24-2b373c8f3223/Untitled.png)
+
+Configurar de la siguiente manera
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fa7f45fe-aec7-4256-92e4-3b66abec87fa/Untitled.png)
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f5c7859f-b046-457f-8884-965b1b6e44a4/Untitled.png)
+
+Dar click en “Create Web Service”
+
+Nos dirigimos a “Enviroment” y luego “Add Enviroment Variable”
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/79e4027e-831b-4452-a74a-d4d41dfd2a00/Untitled.png)
+
+En nuestro proyecto db_news de Console Clever Cloud, damos click en Addon Dashboard, ahi se encuentras las credenciales que vamos a ligar a nuestras Variables de entorno de nuestro proyecto en render.com
+
+Ahora en [render.com](http://render.com) debemos tener algo como lo siguiente (Reemplazar los “value” según el caso de mis credenciales de mi proyecto db_news en Console Clever Cloud)
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a21d2fd8-9bfc-4da4-a783-3ca85b617fa0/Untitled.png)
+
+Damos click en “Save Changes”
+
+## Paso 8
+
+En nuestro panel de Clever Cloud de nuestro proyecto db_news nos dirigimos a donde dice “phpMyAdmin”
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4a2b36ef-362e-4960-8083-30ca8aecffbe/Untitled.png)
+
+Una vez adentro del panel, damos click a la primera base de datos que nos aparece (El nombre cambia según cada proyecto) En mi caso es el siguiente
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/19b30eac-1916-46c6-bb02-a9975c45b40e/Untitled.png)
+
+Estando ahí damos click donde dice “SQL”
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8166a594-9f70-4871-a385-60b14c323507/Untitled.png)
+
+Dentro de ahí, pegamos nuestro script de nuestra Base de Datos:
+
+```sql
+CREATE TABLE profiles (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE states (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL UNIQUE,
+    `abreviacion` VARCHAR(5) NOT NULL UNIQUE,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(30) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(30) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(30) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE users(
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `perfil_id` BIGINT(20) UNSIGNED NOT NULL,
+    `nombre` VARCHAR(100) NOT NULL,
+    `apellidos` VARCHAR(100) NOT NULL,
+    `nick` VARCHAR(20) NOT NULL,
+    `correo` VARCHAR(255) NOT NULL UNIQUE,
+    `contraseña` VARCHAR(255) NOT NULL,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(20) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(20) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(20) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+ALTER TABLE users ADD FOREIGN KEY (perfil_id) REFERENCES profiles(id);
+
+CREATE TABLE categories(
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL UNIQUE,
+    `descripcion` VARCHAR(255) NOT NULL,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(20) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(20) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(20) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE news(
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `categoria_id` BIGINT(20) UNSIGNED NOT NULL,
+    `estado_id` BIGINT(20) UNSIGNED NOT NULL,
+    `usuario_id` BIGINT(20) UNSIGNED NOT NULL,
+    `titulo` VARCHAR(50) NOT NULL,
+    `fecha_publicacion` DATETIME NOT NULL,
+    `descripcion` VARCHAR(1000) NOT NULL,
+    `imagen` MEDIUMTEXT NOT NULL,
+    `activo` bit(1) NOT NULL DEFAULT 1,
+    `UserAlta` VARCHAR(20) NOT NULL,
+    `FechaAlta` DATETIME NOT NULL,
+    `UserMod` VARCHAR(20) NOT NULL,
+    `FechaMod` DATETIME NOT NULL,
+    `UserBaja` VARCHAR(20) NOT NULL,
+    `FechaBaja` DATETIME NOT NULL,
+    `createdAt` TIMESTAMP NULL,
+    `updatedAt` TIMESTAMP NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+ALTER TABLE news ADD FOREIGN KEY (categoria_id) REFERENCES categories(id);
+ALTER TABLE news ADD FOREIGN KEY (estado_id) REFERENCES states(id);
+ALTER TABLE news ADD FOREIGN KEY (usuario_id) REFERENCES users(id);
+
+INSERT INTO profiles (nombre) VALUES ('Administrador'), ('Contribuidor');
+INSERT INTO users (perfil_id, nombre, apellidos, nick, correo, contraseña, 
+activo, UserAlta, FechaAlta, UserMod, FechaMod, UserBaja, FechaBaja) VALUES 
+(1, 'Administrador', 'Sistema', 'Admin', 'Admin@gmail.com', 'cursoexpressjs', 1, 
+'Admin', '2023-07-13', '', '1990-01-01', '', '1990-01-01');
+```
+
+Y damos click donde dice Go
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/aba89fe7-0cf1-4125-adba-424d668db5bc/Untitled.png)
+
+## Paso 9
+
+En nuestro proyecto de [render.com](http://render.com) en la parte superior tendremos la URL de acceso a nuestra API, esta es la que pondremos en nuestro Thunder Client para hacer verificar el funcionamiento correcto, en mi caso es el siguiente:
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/75622731-1a05-4cb9-9c45-5e25f42a9d54/Untitled.png)
+
+No olvides poner el prefijo /api cuando realices tus consultas, ejemplo:

@@ -1,0 +1,1 @@
+INSERT INTO `users` (`profile_id`, `nombre`, `apellidos`, `nick`, `correo`, `contraseña`, `activo`, `UserAlta`, `FechaAlta`, `createdAt`, `updatedAt`) VALUES (2, 'John', 'Doe', 'johndoe', 'johndoe@example.com', 'password', 1, 'System', NOW(), NOW(), NOW());
