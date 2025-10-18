@@ -103,7 +103,7 @@ const deleteUser = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const { nombre, apellidos, nick, correo, contraseña, profile_id } = req.body;
+        const { nombre, apellidos, nick, correo, contraseña, perfil_id } = req.body;
 
         const newUser = await User.create({
             nombre,
@@ -111,7 +111,7 @@ const createUser = async (req, res) => {
             nick,
             correo,
             contraseña,
-            profile_id, // Asegúrate de que este campo se pasa correctamente
+            perfil_id, // Asegúrate de que este campo se pasa correctamente
             UserAlta: 'System',
             FechaAlta: new Date()
         });

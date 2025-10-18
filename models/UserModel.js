@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
-    profile_id: {
+    perfil_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false
     },
