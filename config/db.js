@@ -40,10 +40,9 @@ const connectDB = async () => {
         await sequelize.authenticate();
         console.log('MySQL Conectado exitosamente.');
 
-        // Sincroniza los modelos con la base de datos.
-        // En un entorno de producción, es recomendable usar migraciones en lugar de 'sync'.
-        await sequelize.sync({ alter: true });
-        console.log('Modelos sincronizados con la base de datos.');
+        // La sincronización automática de la base de datos (sequelize.sync) ha sido eliminada.
+        // Esta es una práctica peligrosa en producción. La estructura de la base de datos
+        // debe gestionarse a través de migraciones manuales o scripts de SQL.
     } catch (error) {
         console.error('No se pudo conectar a la base de datos:', error);
         process.exit(1);
