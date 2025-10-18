@@ -22,8 +22,8 @@ const News = require('../models/NewsModel')(sequelize, Sequelize);
 const Profile = require('../models/ProfileModel')(sequelize, Sequelize);
 
 // 3. Definir las asociaciones entre tablas
-User.belongsTo(Profile, { foreignKey: 'profile_id', onDelete: 'CASCADE' });
-Profile.hasMany(User, { foreignKey: 'profile_id', onDelete: 'CASCADE' });
+User.belongsTo(Profile, { foreignKey: 'perfil_id', onDelete: 'CASCADE' });
+Profile.hasMany(User, { foreignKey: 'perfil_id', onDelete: 'CASCADE' });
 
 News.belongsTo(User, { foreignKey: 'usuario_id', onDelete: 'CASCADE' });
 User.hasMany(News, { foreignKey: 'usuario_id', onDelete: 'CASCADE' });
