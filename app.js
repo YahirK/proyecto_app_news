@@ -23,7 +23,12 @@ const profileRoutes = require('./routes/ProfileRoute'); // <-- Importar rutas de
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:4200', 'http://localhost:3000'], // Agrega aquí los orígenes permitidos
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 app.use(express.json({limit: '50mb'})); // <-- express.json() reemplaza a bodyParser.json()
 app.use(express.urlencoded({ extended: false })); // <-- express.urlencoded() reemplaza a bodyParser.urlencoded()
 
