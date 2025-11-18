@@ -21,23 +21,49 @@ const login = (request, response) => {
             return response.status(401).json({ message: "Sin autorización" });
         }
 
-        // Comparar contraseña con bcrypt
-        const match = bcrypt.compareSync(request.body.contraseña, usuario.contraseña);
-        if (!match) {
-            return response.status(401).json({ message: "Sin autorización" });
+        // Comparar contraseña con bcrypt. Si la contraseña en la BD está en texto
+        // plano (legacy), permitimos la comparación directa una vez y re-hasheamos
+        // la contraseña en la base de datos para futuras conexiones.
+        let match = false;
+        try {
+            match = bcrypt.compareSync(request.body.contraseña, usuario.contraseña);
+        } catch (e) {
+            match = false;
         }
 
-        // Preparar datos públicos para el token (no incluir contraseña)
-        const payloadUser = {
-            id: usuario.id,
-            perfil_id: usuario.perfil_id,
-            nombre: usuario.nombre,
-            apellidos: usuario.apellidos,
-            nick: usuario.nick
+        const proceedWithLogin = (userInstance) => {
+            // Preparar datos públicos para el token (no incluir contraseña)
+            const payloadUser = {
+                id: userInstance.id,
+                perfil_id: userInstance.perfil_id,
+                nombre: userInstance.nombre,
+                apellidos: userInstance.apellidos,
+                nick: userInstance.nick
+            };
+
+            const token = jwt.sign({ usuario: payloadUser }, 'mi_llave_secreta', { expiresIn: '24h' });
+            response.status(200).json({ message: "Login con éxito", token: token });
         };
 
-        const token = jwt.sign({ usuario: payloadUser }, 'mi_llave_secreta', { expiresIn: '24h' });
-        response.status(200).json({ message: "Login con éxito", token: token });
+        if (match) {
+            return proceedWithLogin(usuario);
+        }
+
+        // Fallback: si la contraseña almacenada parece no estar hasheada, comprobar igualdad directa
+        // (esto soporta cuentas antiguas creadas en texto plano). Si coincide, hasheamos y actualizamos.
+        if (request.body.contraseña === usuario.contraseña) {
+            const salt = bcrypt.genSaltSync(10);
+            const newHash = bcrypt.hashSync(request.body.contraseña, salt);
+            usuario.update({ contraseña: newHash }).then(updated => {
+                return proceedWithLogin(updated);
+            }).catch(err => {
+                console.error('Error updating legacy password to hash:', err);
+                return response.status(500).json({ error: 'Error al actualizar la contraseña' });
+            });
+            return;
+        }
+
+        return response.status(401).json({ message: "Sin autorización" });
 
     })
         .catch(err => {
