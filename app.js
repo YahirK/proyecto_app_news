@@ -24,7 +24,7 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-    origin: ['http://localhost:4200', 'http://localhost:3000'], // Agrega aquí los orígenes permitidos
+    origin: ['http://localhost:4200', 'http://localhost:3000', "https://proyecto-app-news.onrender.com"], // Agrega aquí los orígenes permitidos
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
