@@ -77,7 +77,10 @@ const register = (request, response) => {
         }
     )
         .catch(err => {
-            response.status(500).send('Error al crear');
+            console.error('Error creating user:', err);
+            // En desarrollo devolvemos el mensaje de error para depuración
+            const msg = err && err.message ? err.message : 'Error al crear';
+            response.status(500).json({ error: msg });
         })
 }
 
