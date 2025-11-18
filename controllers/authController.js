@@ -1,6 +1,7 @@
 const { User } = require('../config/db');
 const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 
 const login = (request, response) => {
@@ -8,22 +9,36 @@ const login = (request, response) => {
     if (!errors.isEmpty()) {
         return response.status(422).json({ errors: errors.mapped() });
     }
+
+    // Buscar usuario por correo y que esté activo
     User.findOne({
         where: {
             correo: request.body.correo,
-            contraseña: request.body.contraseña,
             activo: true
-        },
-        attributes: ['id', 'perfil_id', 'nombre', 'apellidos', 'nick']
+        }
     }).then(usuario => {
-        if (usuario) {
-            const token = jwt.sign({ usuario }, 'mi_llave_secreta', { expiresIn: '24h' });
-            response.status(201).json({ message: "Login con éxito", token: token });
+        if (!usuario) {
+            return response.status(401).json({ message: "Sin autorización" });
         }
-        else {
-            response.status(401).json({ message: "Sin autorización" });
 
+        // Comparar contraseña con bcrypt
+        const match = bcrypt.compareSync(request.body.contraseña, usuario.contraseña);
+        if (!match) {
+            return response.status(401).json({ message: "Sin autorización" });
         }
+
+        // Preparar datos públicos para el token (no incluir contraseña)
+        const payloadUser = {
+            id: usuario.id,
+            perfil_id: usuario.perfil_id,
+            nombre: usuario.nombre,
+            apellidos: usuario.apellidos,
+            nick: usuario.nick
+        };
+
+        const token = jwt.sign({ usuario: payloadUser }, 'mi_llave_secreta', { expiresIn: '24h' });
+        response.status(200).json({ message: "Login con éxito", token: token });
+
     })
         .catch(err => {
             response.status(500).send('Error al consultar el dato');
@@ -36,11 +51,23 @@ const register = (request, response) => {
     if (!errors.isEmpty()) {
         return response.status(422).json({ errors: errors.mapped() });
     }
-    request.body.profile_id = 2
-    request.body.status = true
+
+    // Asegurar que usamos los nombres de columna esperados por el modelo
+    request.body.perfil_id = 2;
+    request.body.activo = true;
+
+    // Hashear la contraseña antes de guardar
+    if (request.body.contraseña) {
+        const salt = bcrypt.genSaltSync(10);
+        request.body.contraseña = bcrypt.hashSync(request.body.contraseña, salt);
+    }
 
     User.create(request.body).then(
         newEntitie => {
+            // No devolver la contraseña en la respuesta
+            if (newEntitie && newEntitie.dataValues) {
+                delete newEntitie.dataValues.contraseña;
+            }
             response.status(201).json(newEntitie)
         }
     )
