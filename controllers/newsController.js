@@ -7,12 +7,14 @@ const { News, User, Category, State } = require('../config/db'); // Importamos l
  */
 const getAllNews = async (req, res) => {
     try {
+        // Traer sólo noticias activas cuyo estado tenga nombre 'aprobada'
         const approvedNews = await News.findAll({
-            where: { status: 'aprobada', activo: true },
+            where: { activo: true },
             include: [
-                { model: User, as: 'User', attributes: ['nombres', 'apellidos'] },
-                { model: Category, as: 'categoria', attributes: ['nombre'] },
-                { model: State, as: 'estado', attributes: ['nombre'] }
+                // Usar alias por defecto definido en las asociaciones (User, Category, State)
+                { model: User, as: 'User', attributes: ['nombre', 'apellidos'] },
+                { model: Category, as: 'Category', attributes: ['nombre'] },
+                { model: State, as: 'State', attributes: ['nombre'], where: { nombre: 'aprobada' }, required: true }
             ],
             order: [
                 ['createdAt', 'DESC'] // Equivalente a sort
