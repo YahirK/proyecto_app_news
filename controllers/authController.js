@@ -62,6 +62,11 @@ const register = (request, response) => {
         request.body.contraseña = bcrypt.hashSync(request.body.contraseña, salt);
     }
 
+    // Valores requeridos por el modelo: UserAlta y FechaAlta
+    // Proveer valores por defecto si no vienen desde el cliente
+    request.body.UserAlta = request.body.nick || 'system';
+    request.body.FechaAlta = request.body.FechaAlta || new Date();
+
     User.create(request.body).then(
         newEntitie => {
             // No devolver la contraseña en la respuesta
