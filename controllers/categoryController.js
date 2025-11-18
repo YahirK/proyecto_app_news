@@ -43,10 +43,20 @@ const getCategoryById = async (req, res) => {
 const createCategory = async (req, res) => {
     const { nombre, descripcion } = req.body;
     try {
-        const newCategory = await Category.create({
+        // Proveer valores por defecto para columnas que la tabla puede requerir
+        const payload = {
             nombre,
-            descripcion
-        });
+            descripcion,
+            activo: req.body.activo !== undefined ? req.body.activo : true,
+            UserAlta: req.body.UserAlta || req.body.nick || 'system',
+            FechaAlta: req.body.FechaAlta || new Date(),
+            UserMod: req.body.UserMod || req.body.nick || 'system',
+            FechaMod: req.body.FechaMod || new Date(),
+            UserBaja: req.body.UserBaja || req.body.nick || 'system',
+            FechaBaja: req.body.FechaBaja || new Date()
+        };
+
+        const newCategory = await Category.create(payload);
         res.status(201).json(newCategory);
     } catch (error) {
         res.status(400).json({ message: 'Error al crear la categoría', error: error.message });

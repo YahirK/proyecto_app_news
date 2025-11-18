@@ -46,16 +46,40 @@ const getNewsById = async (req, res) => {
  * @route   POST /api/news
  */
 const createNews = async (req, res) => {
-    const { categoria_id, estado_id, titulo, description, image } = req.body;
+    // Aceptar tanto 'descripcion' como 'description', y 'imagen' o 'image'
+    const {
+        categoria_id,
+        estado_id,
+        titulo,
+        descripcion,
+        description,
+        imagen,
+        image
+    } = req.body;
+
     try {
-        const newNotice = await News.create({
+        // usuario_id debe venir del token (middleware jwt ahora adjunta req.user)
+        const usuarioId = req.user && req.user.id ? req.user.id : null;
+        if (!usuarioId) return res.status(401).json({ message: 'No se encontró usuario en el token' });
+
+        const payload = {
             categoria_id,
             estado_id,
             titulo,
-            description,
-            imagen: image, // Asegurarse que el nombre del campo coincida con el modelo
-            usuario_id: req.user.id, // El ID viene del middleware 'protect' (Sequelize usa 'id')
-        });
+            descripcion: descripcion || description || '',
+            imagen: imagen || image || '',
+            usuario_id: usuarioId,
+            activo: req.body.activo !== undefined ? req.body.activo : true,
+            fecha_publicacion: req.body.fecha_publicacion || new Date(),
+            UserAlta: req.body.UserAlta || req.user.nick || req.user.nombre || 'system',
+            FechaAlta: req.body.FechaAlta || new Date(),
+            UserMod: req.body.UserMod || req.user.nick || req.user.nombre || 'system',
+            FechaMod: req.body.FechaMod || new Date(),
+            UserBaja: req.body.UserBaja || req.user.nick || req.user.nombre || 'system',
+            FechaBaja: req.body.FechaBaja || new Date()
+        };
+
+        const newNotice = await News.create(payload);
         res.status(201).json(newNotice);
     } catch (error) {
         res.status(400).json({ message: 'Error al crear la noticia', error: error.message });

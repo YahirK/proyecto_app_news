@@ -42,7 +42,19 @@ const getStateById = async (req, res) => {
 const createState = async (req, res) => {
     const { nombre, abreviacion } = req.body;
     try { // La validación ya se hizo en el middleware
-        const newState = await State.create({ nombre, abreviacion });
+        const payload = {
+            nombre,
+            abreviacion,
+            activo: req.body.activo !== undefined ? req.body.activo : true,
+            UserAlta: req.body.UserAlta || req.body.nick || 'system',
+            FechaAlta: req.body.FechaAlta || new Date(),
+            UserMod: req.body.UserMod || req.body.nick || 'system',
+            FechaMod: req.body.FechaMod || new Date(),
+            UserBaja: req.body.UserBaja || req.body.nick || 'system',
+            FechaBaja: req.body.FechaBaja || new Date()
+        };
+
+        const newState = await State.create(payload);
         res.status(201).json(newState);
     } catch (error) {
         res.status(400).json({ message: 'Error al crear el estado', error: error.message });

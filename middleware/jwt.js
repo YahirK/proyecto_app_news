@@ -13,12 +13,14 @@ const authenticateAdmin = (req, res, next) => {
         if (err) {
             return res.status(403).send({ message: 'Sin autorización' });
         }
-        if (decoded.usuario.perfil_id === 1) {
-            next();
+        // Attach decoded user to request for downstream handlers
+        if (decoded && decoded.usuario) {
+            req.user = decoded.usuario;
+            if (decoded.usuario.perfil_id === 1) {
+                return next();
+            }
         }
-        else {
-            return res.status(403).send({ message: 'Sin autorización' });
-        }
+        return res.status(403).send({ message: 'Sin autorización' });
 
     });
 }
@@ -35,12 +37,11 @@ const authenticateAny = (req, res, next) => {
         if (err) {
             return res.status(403).send({ message: 'Sin autorización' });
         }
-        if (decoded) {
-            next();
+        if (decoded && decoded.usuario) {
+            req.user = decoded.usuario;
+            return next();
         }
-        else {
-            return res.status(403).send({ message: 'Sin autorización' });
-        }
+        return res.status(403).send({ message: 'Sin autorización' });
 
     });
 }
