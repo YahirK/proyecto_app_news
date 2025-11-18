@@ -10,7 +10,7 @@ const getAllNews = async (req, res) => {
         const approvedNews = await News.findAll({
             where: { status: 'aprobada', activo: true },
             include: [
-                { model: User, as: 'usuario', attributes: ['nombres', 'apellidos'] },
+                { model: User, as: 'User', attributes: ['nombres', 'apellidos'] },
                 { model: Category, as: 'categoria', attributes: ['nombre'] },
                 { model: State, as: 'estado', attributes: ['nombre'] }
             ],
