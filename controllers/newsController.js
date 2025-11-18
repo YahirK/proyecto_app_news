@@ -14,7 +14,8 @@ const getAllNews = async (req, res) => {
                 // Usar alias por defecto definido en las asociaciones (User, Category, State)
                 { model: User, as: 'User', attributes: ['nombre', 'apellidos'] },
                 { model: Category, as: 'Category', attributes: ['nombre'] },
-                { model: State, as: 'State', attributes: ['nombre'], where: { nombre: 'aprobada' }, required: true }
+                // Incluir el estado sin forzar filtrado por nombre aqui; si no hay estados 'aprobada' esto devolvía lista vacía
+                { model: State, as: 'State', attributes: ['nombre'] }
             ],
             order: [
                 ['createdAt', 'DESC'] // Equivalente a sort
