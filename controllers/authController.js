@@ -69,9 +69,9 @@ const register = (request, response) => {
     // Evitar errores por columnas que en la BD requieren valor (UserMod/FechaMod)
     request.body.UserMod = request.body.UserMod || request.body.nick || 'system';
     request.body.FechaMod = request.body.FechaMod || new Date();
-    // Asegurar campos de baja aunque normalmente sean nulos
-    request.body.UserBaja = request.body.UserBaja || null;
-    request.body.FechaBaja = request.body.FechaBaja || null;
+    // Evitar error si la BD no acepta NULL en campos de baja: dar valores por defecto
+    request.body.UserBaja = request.body.UserBaja || request.body.nick || 'system';
+    request.body.FechaBaja = request.body.FechaBaja || new Date();
 
     User.create(request.body).then(
         newEntitie => {
